@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/constants/app_colors.dart';
 import 'login_screen.dart';
+import 'main_app_screen.dart';
 
 // ── Data model for each slide ──────────────────────────────────────────────
 class _SlideData {
@@ -53,22 +54,19 @@ class _HomeScreenState extends State<HomeScreen> {
     _startAutoScroll();
   }
 
-  void _startAutoScroll() {
-    _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-      if (_currentPage < _slides.length - 1) {
-        _pageController.nextPage(
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeInOut,
-        );
-      } else {
-        _pageController.animateToPage(
-          0,
-          duration: const Duration(milliseconds: 600),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
-  }
+void _startAutoScroll() {
+  _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+    if (_currentPage < _slides.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 600),
+        curve: Curves.easeInOut,
+      );
+    } else {
+      // Last slide reached — stop the timer
+      _autoScrollTimer?.cancel();
+    }
+  });
+}
 
   @override
   void dispose() {
@@ -80,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _goToLogin() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      MaterialPageRoute(builder: (_) => const MainAppScreen()),
     );
   }
 
