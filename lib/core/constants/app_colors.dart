@@ -9,7 +9,7 @@ class AppColors {
   static const Color primaryDark    = Color(0xFF254D78);
 
   // Accent / gold for the Journey italic
-  static const Color accent         = Color(0xFFC9A84C);
+  static const Color accent = Color(0xFF8FB8D9);
 
   // Neutrals
   static const Color white          = Color(0xFFFFFFFF);
