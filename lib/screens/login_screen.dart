@@ -5,6 +5,7 @@ import '../core/constants/app_strings.dart';
 import '../widgets/nirvaan_logo.dart';
 import '../widgets/primary_button.dart';
 import 'travel_details_screen.dart';
+import '../screens/forgot_password_method_screen.dart';
 import '../core/services/location_api_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -15,9 +16,9 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController    = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _passwordVisible     = false;
+  bool _passwordVisible = false;
   String? _emailError;
   String? _passwordError;
 
@@ -72,11 +73,8 @@ class _LoginScreenState extends State<LoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(height: 18),
-
               const NirvaanLogo(size: 125, showTagline: true),
-
               const SizedBox(height: 14),
-
               Text(
                 AppStrings.createAccount,
                 style: GoogleFonts.poppins(
@@ -94,9 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 textAlign: TextAlign.center,
               ),
-
               const SizedBox(height: 18),
-
               TextField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
@@ -124,178 +120,185 @@ class _LoginScreenState extends State<LoginScreen> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: const BorderSide(color: AppColors.border),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
-                  color: AppColors.primary,
-                  width: 1.5,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
                 ),
               ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red, width: 1.5),
-              ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red, width: 1.5),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 12),
-
-          TextField(
-            controller: _passwordController,
-            obscureText: !_passwordVisible,
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: AppColors.textDark,
-            ),
-            decoration: InputDecoration(
-              hintText: 'Enter your password',
-              hintStyle: GoogleFonts.poppins(
-                fontSize: 14,
-                color: AppColors.hint,
-              ),
-              errorText: _passwordError,
-              filled: true,
-              fillColor: AppColors.inputFill,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 12,
-              ),
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _passwordVisible ? Icons.visibility_off : Icons.visibility,
-                  color: AppColors.hint,
-                  size: 20,
+              const SizedBox(height: 12),
+              TextField(
+                controller: _passwordController,
+                obscureText: !_passwordVisible,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: AppColors.textDark,
                 ),
-                onPressed: () => setState(
-                  () => _passwordVisible = !_passwordVisible,
+                decoration: InputDecoration(
+                  hintText: 'Enter your password',
+                  hintStyle: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: AppColors.hint,
+                  ),
+                  errorText: _passwordError,
+                  filled: true,
+                  fillColor: AppColors.inputFill,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _passwordVisible
+                          ? Icons.visibility_off
+                          : Icons.visibility,
+                      color: AppColors.hint,
+                      size: 20,
+                    ),
+                    onPressed: () => setState(
+                      () => _passwordVisible = !_passwordVisible,
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
                 ),
               ),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.border),
+              const SizedBox(height: 14),
+              PrimaryButton(
+                label: AppStrings.continueBtn,
+                onPressed: _onContinue,
+                backgroundColor: AppColors.textDark,
+                height: 48,
               ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: AppColors.border),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(
-                  color: AppColors.primary,
-                  width: 1.5,
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ForgotPasswordMethodScreen(),
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Forgot Password?",
+                  style: TextStyle(
+                    color: Color(0xFF4A7FD4),
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red, width: 1.5),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Expanded(
+                    child: Divider(color: AppColors.border, thickness: 1),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: Text(
+                      'or',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Divider(color: AppColors.border, thickness: 1),
+                  ),
+                ],
               ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: Colors.red, width: 1.5),
-              ),
-            ),
-          ),
-
-          const SizedBox(height: 14),
-
-          PrimaryButton(
-            label: AppStrings.continueBtn,
-            onPressed: _onContinue,
-            backgroundColor: AppColors.textDark,
-            height: 48,
-          ),
-
-          const SizedBox(height: 18),
-
-          Row(
-            children: [
-              Expanded(
-                child: Divider(color: AppColors.border, thickness: 1),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                child: Text(
-                  'or',
+              const SizedBox(height: 14),
+              _SocialButton(
+                label: AppStrings.googleBtn,
+                icon: Text(
+                  'G',
                   style: GoogleFonts.poppins(
-                    fontSize: 12,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: const Color(0xFF4285F4),
+                  ),
+                ),
+                onTap: () {},
+              ),
+              const SizedBox(height: 10),
+              _SocialButton(
+                label: AppStrings.appleBtn,
+                icon: const Icon(
+                  Icons.apple,
+                  size: 22,
+                  color: Colors.black,
+                ),
+                onTap: () {},
+              ),
+              const Spacer(),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: GoogleFonts.poppins(
+                    fontSize: 10.5,
                     color: AppColors.textLight,
                   ),
-                ),
-              ),
-              Expanded(
-                child: Divider(color: AppColors.border, thickness: 1),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 14),
-
-          _SocialButton(
-            label: AppStrings.googleBtn,
-            icon: Text(
-              'G',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-                color: const Color(0xFF4285F4),
-              ),
-            ),
-            onTap: () {},
-          ),
-
-          const SizedBox(height: 10),
-
-          _SocialButton(
-            label: AppStrings.appleBtn,
-            icon: const Icon(
-              Icons.apple,
-              size: 22,
-              color: Colors.black,
-            ),
-            onTap: () {},
-          ),
-
-          const Spacer(),
-
-          RichText(
-            textAlign: TextAlign.center,
-            text: TextSpan(
-              style: GoogleFonts.poppins(
-                fontSize: 10.5,
-                color: AppColors.textLight,
-              ),
-              children: [
-                const TextSpan(
-                  text: 'By clicking continue, you agree to our ',
-                ),
-                TextSpan(
-                  text: 'Terms of Service',
-                  style: GoogleFonts.poppins(
-                    fontSize: 10.5,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w500,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-                const TextSpan(text: '\nand '),
-                TextSpan(
-                  text: 'Privacy Policy',
-                  style: GoogleFonts.poppins(
-                    fontSize: 10.5,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w500,
-                    decoration: TextDecoration.underline,
+                  children: [
+                    const TextSpan(
+                      text: 'By clicking continue, you agree to our ',
+                    ),
+                    TextSpan(
+                      text: 'Terms of Service',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10.5,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                    const TextSpan(text: '\nand '),
+                    TextSpan(
+                      text: 'Privacy Policy',
+                      style: GoogleFonts.poppins(
+                        fontSize: 10.5,
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
                       ),
                     ),
                   ],
                 ),
               ),
-
               const SizedBox(height: 14),
             ],
           ),

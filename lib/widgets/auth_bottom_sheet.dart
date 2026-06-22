@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../core/constants/app_colors.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/nirvaan_logo.dart';
+import '../screens/forgot_password_method_screen.dart';
 
 Future<bool> showAuthSheet(
   BuildContext context, {
@@ -173,7 +174,9 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
     ref.read(authProvider.notifier).login(
           _emailController.text.trim(),
           name: _isCreateAccount ? _nameController.text.trim() : null,
-          age: _isCreateAccount ? int.tryParse(_ageController.text.trim()) : null,
+          age: _isCreateAccount
+              ? int.tryParse(_ageController.text.trim())
+              : null,
           phone: _isCreateAccount ? _phoneController.text.trim() : null,
         );
 
@@ -286,8 +289,9 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                   hint: 'Password',
                   errorText: _passwordError,
                   obscure: !_passwordVisible,
-                  textInputAction:
-                      _isCreateAccount ? TextInputAction.next : TextInputAction.done,
+                  textInputAction: _isCreateAccount
+                      ? TextInputAction.next
+                      : TextInputAction.done,
                   onSubmitted: (_) {
                     if (!_isCreateAccount) _submit();
                   },
@@ -329,7 +333,8 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                         color: AppColors.hint,
                       ),
                       onPressed: () => setState(
-                        () => _confirmPasswordVisible = !_confirmPasswordVisible,
+                        () =>
+                            _confirmPasswordVisible = !_confirmPasswordVisible,
                       ),
                     ),
                   ),
@@ -354,6 +359,25 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                             ),
                           )
                           .toList(),
+                    ),
+                  ),
+                ],
+                if (!_isCreateAccount) ...[
+                  const SizedBox(height: 8),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const ForgotPasswordMethodScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Forgot Password?',
+                      ),
                     ),
                   ),
                 ],
