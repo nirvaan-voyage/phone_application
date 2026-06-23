@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
 
 class PasswordResetSuccessScreen extends StatelessWidget {
   const PasswordResetSuccessScreen({super.key});
@@ -8,49 +7,42 @@ class PasswordResetSuccessScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 80, 24, 24),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 50,
+              const CircleAvatar(
+                radius: 46,
                 backgroundColor: Color(0xFFEAF1FB),
                 child: Icon(
                   Icons.check_circle,
-                  size: 60,
+                  size: 56,
                   color: Color(0xFF4A7FD4),
                 ),
               ),
-              const SizedBox(height: 25),
+              const SizedBox(height: 22),
               const Text(
-                "Password Reset!",
+                'Password Reset!',
                 style: TextStyle(
-                  fontSize: 30,
+                  fontSize: 28,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 10),
               const Text(
-                "Your password has been updated successfully",
+                'Your password has been updated successfully.',
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 30),
+              const SizedBox(height: 26),
               SizedBox(
                 width: double.infinity,
-                height: 52,
+                height: 50,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.pushAndRemoveUntil(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                      ),
-                      (route) => false,
-                    );
+                    Navigator.popUntil(context, (route) => route.isFirst);
                   },
-                  child: const Text("Back To Login"),
+                  child: const Text('Back to Login'),
                 ),
               ),
             ],

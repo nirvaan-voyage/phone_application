@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'forgot_password_email_screen.dart';
 import 'forgot_password_mobile_screen.dart';
 
@@ -14,80 +15,77 @@ class ForgotPasswordMethodScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          children: [
-            const SizedBox(height: 20),
-            Container(
-              width: 80,
-              height: 80,
-              decoration: BoxDecoration(
-                color: const Color(0xFFEAF1FB),
-                borderRadius: BorderRadius.circular(40),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 10, 24, 24),
+          child: Column(
+            children: [
+              Container(
+                width: 68,
+                height: 68,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEAF1FB),
+                  borderRadius: BorderRadius.circular(34),
+                ),
+                child: const Icon(
+                  Icons.lock_outline,
+                  color: Color(0xFF4A7FD4),
+                  size: 34,
+                ),
               ),
-              child: const Icon(
-                Icons.lock_outline,
-                color: Color(0xFF4A7FD4),
-                size: 40,
+              const SizedBox(height: 18),
+              const Text(
+                'Reset password',
+                style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              "Reset your password",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+              const SizedBox(height: 8),
+              const Text(
+                'Choose where to receive your reset code.',
+                textAlign: TextAlign.center,
               ),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              "How would you like to receive your reset code?",
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 30),
-            _methodCard(
-              icon: Icons.email_outlined,
-              title: "Email address",
-              subtitle: "Code sent to your email",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ForgotPasswordEmailScreen(),
-                  ),
-                );
-                // Email Screen
-              },
-            ),
-            const SizedBox(height: 15),
-            const Text("OR"),
-            const SizedBox(height: 15),
-            _methodCard(
-              icon: Icons.phone_android,
-              title: "Mobile number",
-              subtitle: "OTP sent via SMS",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ForgotPasswordMobileScreen(),
-                  ),
-                );
-                // Mobile Screen
-              },
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context);
+              const SizedBox(height: 24),
+              _methodCard(
+                icon: Icons.email_outlined,
+                title: 'Email address',
+                subtitle: '4-digit code sent to your email',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ForgotPasswordEmailScreen(),
+                    ),
+                  );
                 },
-                child: const Text("Back to Login"),
               ),
-            ),
-          ],
+              const SizedBox(height: 14),
+              const Text('OR'),
+              const SizedBox(height: 14),
+              _methodCard(
+                icon: Icons.phone_android,
+                title: 'Mobile number',
+                subtitle: '4-digit OTP sent via SMS',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const ForgotPasswordMobileScreen(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 28),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Back to Login'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -101,6 +99,7 @@ class ForgotPasswordMethodScreen extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -117,15 +116,11 @@ class ForgotPasswordMethodScreen extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   Text(
                     subtitle,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                    ),
+                    style: const TextStyle(color: Colors.grey),
                   ),
                 ],
               ),
