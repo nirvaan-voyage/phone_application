@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../providers/auth_provider.dart';
+import '../screens/forgot_password_method_screen.dart';
 import '../widgets/nirvaan_logo.dart';
 
 Future<bool> showAuthSheet(
@@ -37,40 +38,62 @@ class _AuthSheet extends ConsumerStatefulWidget {
 class _AuthSheetState extends ConsumerState<_AuthSheet> {
   final _nameController = TextEditingController();
   final _ageController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _loginController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _otpController = TextEditingController();
 
   late _AuthMode _mode;
   bool _passwordVisible = false;
   bool _confirmPasswordVisible = false;
+  bool _rememberMe = true;
 
   String? _nameError;
   String? _ageError;
-  String? _emailError;
+  String? _loginError;
   String? _phoneError;
   String? _passwordError;
   String? _confirmPasswordError;
+  String? _otpError;
 
   @override
   void initState() {
     super.initState();
     _mode = widget.initialMode;
+    _loginController.addListener(_refreshForLoginType);
   }
 
   @override
   void dispose() {
+    _loginController.removeListener(_refreshForLoginType);
     _nameController.dispose();
     _ageController.dispose();
-    _emailController.dispose();
+    _loginController.dispose();
     _phoneController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _otpController.dispose();
     super.dispose();
   }
 
   bool get _isCreateAccount => _mode == _AuthMode.createAccount;
+
+  bool get _isPhoneLogin {
+    if (_isCreateAccount) return false;
+    final value = _loginController.text.trim();
+    return RegExp(r'^\d+$').hasMatch(value);
+  }
+
+  void _refreshForLoginType() {
+    if (!_isCreateAccount) {
+      setState(() {
+        _loginError = null;
+        _otpError = null;
+        _passwordError = null;
+      });
+    }
+  }
 
   void _switchToCreateAccount() {
     setState(() {
@@ -89,45 +112,32 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
   void _clearErrors() {
     _nameError = null;
     _ageError = null;
-    _emailError = null;
+    _loginError = null;
     _phoneError = null;
     _passwordError = null;
     _confirmPasswordError = null;
+    _otpError = null;
   }
 
-  bool _isValidPassword(String password) {
-    return password.length >= 6;
-  }
+  bool _isValidPassword(String password) => password.length >= 6;
 
   List<String> _missingPasswordRequirements(String password) {
-    final missing = <String>[];
-    if (password.length < 6) {
-      missing.add('At least 6 characters');
-    }
-    return missing;
+    if (password.isEmpty || password.length >= 6) return const [];
+    return const ['At least 6 characters'];
   }
 
-  void _submit() {
+  bool _isValidEmail(String value) {
+    return value.contains('@') && value.contains('.');
+  }
+
+  Future<void> _submit() async {
     FocusScope.of(context).unfocus();
 
     setState(() {
       _clearErrors();
 
-      final email = _emailController.text.trim();
-      if (email.isEmpty) {
-        _emailError = 'Please enter your email';
-      } else if (!email.contains('@') || !email.contains('.')) {
-        _emailError = 'Please enter a valid email';
-      }
-
+      final loginId = _loginController.text.trim();
       final password = _passwordController.text;
-      if (password.isEmpty) {
-        _passwordError = 'Please enter your password';
-      } else if (_isCreateAccount && !_isValidPassword(password)) {
-        _passwordError = 'Password must be at least 6 characters';
-      } else if (!_isCreateAccount && password.length < 6) {
-        _passwordError = 'Minimum 6 characters';
-      }
 
       if (_isCreateAccount) {
         final name = _nameController.text.trim();
@@ -145,10 +155,22 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
           _ageError = 'Please enter a valid age';
         }
 
+        if (loginId.isEmpty) {
+          _loginError = 'Please enter your email';
+        } else if (!_isValidEmail(loginId)) {
+          _loginError = 'Please enter a valid email';
+        }
+
         if (phone.isEmpty) {
           _phoneError = 'Please enter your phone number';
-        } else if (phone.length < 10) {
-          _phoneError = 'Enter a valid phone number';
+        } else if (phone.length != 10) {
+          _phoneError = 'Phone number must be 10 digits';
+        }
+
+        if (password.isEmpty) {
+          _passwordError = 'Please enter your password';
+        } else if (!_isValidPassword(password)) {
+          _passwordError = 'Password must be at least 6 characters';
         }
 
         if (confirmPassword.isEmpty) {
@@ -156,28 +178,75 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
         } else if (confirmPassword != password) {
           _confirmPasswordError = 'Passwords do not match';
         }
+      } else {
+        if (loginId.isEmpty) {
+          _loginError = 'Enter email, username, or phone';
+        } else if (_isPhoneLogin && loginId.length != 10) {
+          _loginError = 'Phone number must be 10 digits';
+        }
+
+        if (_isPhoneLogin) {
+          final otp = _otpController.text.trim();
+          if (otp.isEmpty) {
+            _otpError = 'Enter the 4-digit OTP';
+          } else if (otp.length != 4) {
+            _otpError = 'OTP must be 4 digits';
+          }
+        } else if (password.isEmpty) {
+          _passwordError = 'Please enter your password';
+        } else if (password.length < 6) {
+          _passwordError = 'Minimum 6 characters';
+        }
       }
     });
 
     final hasErrors = [
       _nameError,
       _ageError,
-      _emailError,
+      _loginError,
       _phoneError,
       _passwordError,
       _confirmPasswordError,
+      _otpError,
     ].any((error) => error != null);
 
     if (hasErrors) return;
 
-    ref.read(authProvider.notifier).login(
-          _emailController.text.trim(),
+    await ref.read(authProvider.notifier).login(
+          _loginController.text.trim(),
           name: _isCreateAccount ? _nameController.text.trim() : null,
           age: _isCreateAccount ? int.tryParse(_ageController.text.trim()) : null,
-          phone: _isCreateAccount ? _phoneController.text.trim() : null,
+          phone: _isCreateAccount
+              ? _phoneController.text.trim()
+              : (_isPhoneLogin ? _loginController.text.trim() : null),
+          rememberMe: _rememberMe,
         );
 
-    Navigator.of(context).pop(true);
+    if (mounted) {
+      Navigator.of(context).pop(true);
+    }
+  }
+
+  Future<void> _socialLogin(String provider) async {
+    await ref.read(authProvider.notifier).socialLogin(
+          provider,
+          rememberMe: _rememberMe,
+        );
+    if (mounted) {
+      Navigator.of(context).pop(true);
+    }
+  }
+
+  void _openForgotPassword() {
+    final navigator = Navigator.of(context);
+    navigator.pop(false);
+    Future.microtask(() {
+      navigator.push(
+        MaterialPageRoute(
+          builder: (_) => const ForgotPasswordMethodScreen(),
+        ),
+      );
+    });
   }
 
   @override
@@ -204,7 +273,7 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
           top: false,
           child: SingleChildScrollView(
             keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-            padding: const EdgeInsets.fromLTRB(24, 14, 24, 24),
+            padding: const EdgeInsets.fromLTRB(22, 12, 22, 22),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -216,28 +285,28 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-                const SizedBox(height: 20),
-                const NirvaanLogo(size: 72, showTagline: false),
                 const SizedBox(height: 14),
+                const NirvaanLogo(size: 62, showTagline: false),
+                const SizedBox(height: 10),
                 Text(
-                  _isCreateAccount ? 'Create account' : 'Sign in to continue',
+                  _isCreateAccount ? 'Create account' : 'Sign in',
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark,
                   ),
                 ),
-                const SizedBox(height: 6),
+                const SizedBox(height: 4),
                 Text(
                   _isCreateAccount
                       ? 'Set up your Nirvaan profile'
-                      : 'Access all features of Nirvaan',
+                      : 'Use email, username, or phone',
                   style: GoogleFonts.poppins(
-                    fontSize: 13,
+                    fontSize: 12,
                     color: AppColors.textLight,
                   ),
                 ),
-                const SizedBox(height: 22),
+                const SizedBox(height: 18),
                 if (_isCreateAccount) ...[
                   _SheetField(
                     controller: _nameController,
@@ -245,7 +314,7 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                     errorText: _nameError,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   _SheetField(
                     controller: _ageController,
                     hint: 'Age',
@@ -257,17 +326,17 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                       LengthLimitingTextInputFormatter(3),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                 ],
                 _SheetField(
-                  controller: _emailController,
-                  hint: 'Email',
-                  errorText: _emailError,
+                  controller: _loginController,
+                  hint: _isCreateAccount ? 'Email' : 'Email, username, or phone',
+                  errorText: _loginError,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
                 ),
                 if (_isCreateAccount) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   _SheetField(
                     controller: _phoneController,
                     hint: 'Phone number',
@@ -280,39 +349,49 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                     ],
                   ),
                 ],
-                const SizedBox(height: 12),
-                _SheetField(
-                  controller: _passwordController,
-                  hint: 'Password',
-                  errorText: _passwordError,
-                  obscure: !_passwordVisible,
-                  textInputAction:
-                      _isCreateAccount ? TextInputAction.next : TextInputAction.done,
-                  onSubmitted: (_) {
-                    if (!_isCreateAccount) _submit();
-                  },
-                  onChanged: (_) {
-                    if (_isCreateAccount) {
-                      setState(() {
-                        _passwordError = null;
-                      });
-                    }
-                  },
-                  suffix: IconButton(
-                    icon: Icon(
-                      _passwordVisible
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      size: 18,
-                      color: AppColors.hint,
-                    ),
-                    onPressed: () => setState(
-                      () => _passwordVisible = !_passwordVisible,
+                const SizedBox(height: 10),
+                if (_isPhoneLogin)
+                  _SheetField(
+                    controller: _otpController,
+                    hint: '4-digit OTP',
+                    errorText: _otpError,
+                    keyboardType: TextInputType.number,
+                    textInputAction: TextInputAction.done,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.digitsOnly,
+                      LengthLimitingTextInputFormatter(4),
+                    ],
+                    onSubmitted: (_) => _submit(),
+                  )
+                else
+                  _SheetField(
+                    controller: _passwordController,
+                    hint: 'Password',
+                    errorText: _passwordError,
+                    obscure: !_passwordVisible,
+                    textInputAction:
+                        _isCreateAccount ? TextInputAction.next : TextInputAction.done,
+                    onSubmitted: (_) {
+                      if (!_isCreateAccount) _submit();
+                    },
+                    onChanged: (_) {
+                      if (_isCreateAccount) {
+                        setState(() => _passwordError = null);
+                      }
+                    },
+                    suffix: IconButton(
+                      icon: Icon(
+                        _passwordVisible ? Icons.visibility_off : Icons.visibility,
+                        size: 18,
+                        color: AppColors.hint,
+                      ),
+                      onPressed: () => setState(
+                        () => _passwordVisible = !_passwordVisible,
+                      ),
                     ),
                   ),
-                ),
                 if (_isCreateAccount) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
                   _SheetField(
                     controller: _confirmPasswordController,
                     hint: 'Confirm password',
@@ -337,30 +416,64 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                 if (_isCreateAccount &&
                     _passwordController.text.isNotEmpty &&
                     missingPasswordRequirements.isNotEmpty) ...[
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 8),
                   Align(
                     alignment: Alignment.centerLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: missingPasswordRequirements
-                          .map(
-                            (requirement) => Text(
-                              requirement,
-                              style: GoogleFonts.poppins(
-                                fontSize: 11,
-                                color: Colors.red,
-                                height: 1.35,
-                              ),
-                            ),
-                          )
-                          .toList(),
+                    child: Text(
+                      missingPasswordRequirements.first,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: Colors.red,
+                        height: 1.35,
+                      ),
                     ),
                   ),
                 ],
-                const SizedBox(height: 22),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Checkbox(
+                      value: _rememberMe,
+                      activeColor: AppColors.primary,
+                      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      onChanged: (value) {
+                        setState(() => _rememberMe = value ?? false);
+                      },
+                    ),
+                    Text(
+                      'Remember me',
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    const Spacer(),
+                    if (!_isCreateAccount)
+                      TextButton(
+                        onPressed: _openForgotPassword,
+                        style: TextButton.styleFrom(
+                          minimumSize: Size.zero,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 2,
+                          ),
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          'Forgot password?',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 SizedBox(
                   width: double.infinity,
-                  height: 50,
+                  height: 48,
                   child: ElevatedButton(
                     onPressed: _submit,
                     style: ElevatedButton.styleFrom(
@@ -370,7 +483,9 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                       ),
                     ),
                     child: Text(
-                      _isCreateAccount ? 'Continue' : 'Sign In',
+                      _isCreateAccount
+                          ? 'Continue'
+                          : (_isPhoneLogin ? 'Verify OTP' : 'Sign In'),
                       style: GoogleFonts.poppins(
                         fontSize: 15,
                         fontWeight: FontWeight.w600,
@@ -380,7 +495,51 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                   ),
                 ),
                 if (!_isCreateAccount) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      const Expanded(child: Divider(color: AppColors.border)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: Text(
+                          'or',
+                          style: GoogleFonts.poppins(
+                            fontSize: 11,
+                            color: AppColors.textLight,
+                          ),
+                        ),
+                      ),
+                      const Expanded(child: Divider(color: AppColors.border)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _SocialButton(
+                          label: 'Google',
+                          icon: Text(
+                            'G',
+                            style: GoogleFonts.poppins(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: const Color(0xFF4285F4),
+                            ),
+                          ),
+                          onTap: () => _socialLogin('Google'),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _SocialButton(
+                          label: 'Apple',
+                          icon: const Icon(Icons.apple, size: 20),
+                          onTap: () => _socialLogin('Apple'),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 14),
                   RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
@@ -409,7 +568,7 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                     ),
                   ),
                 ] else ...[
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 12),
                   GestureDetector(
                     onTap: _switchToSignIn,
                     child: Text(
@@ -482,7 +641,7 @@ class _SheetField extends StatelessWidget {
         fillColor: AppColors.inputFill,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 16,
-          vertical: 13,
+          vertical: 12,
         ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
@@ -506,6 +665,49 @@ class _SheetField extends StatelessWidget {
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Colors.red, width: 1.5),
+        ),
+      ),
+    );
+  }
+}
+
+class _SocialButton extends StatelessWidget {
+  const _SocialButton({
+    required this.label,
+    required this.icon,
+    required this.onTap,
+  });
+
+  final String label;
+  final Widget icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        height: 44,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: AppColors.border, width: 1.1),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textDark,
+              ),
+            ),
+          ],
         ),
       ),
     );

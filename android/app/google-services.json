@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "352551253014",
+    "project_id": "nirvaan-7fcf5",
+    "storage_bucket": "nirvaan-7fcf5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:352551253014:android:868ed637905892aab63137",
+        "android_client_info": {
+          "package_name": "com.example.nirvaan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCE28xz7qHCO9hv3NEVtTMNqDP6Q-S6gFU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
