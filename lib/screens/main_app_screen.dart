@@ -7,6 +7,7 @@ import '../providers/auth_provider.dart';
 import '../widgets/auth_bottom_sheet.dart';
 import 'travel_details_screen.dart';
 import 'placeholder_screen.dart';
+import 'itinerary_questionnaire_screen.dart';
 
 // ── Auth-aware navigation helper ───────────────────────────────────────────
 Future<void> _navOrLogin(
@@ -20,10 +21,7 @@ Future<void> _navOrLogin(
     final didSignIn = await showAuthSheet(context);
     // If login succeeded, continue to the original destination
     if (didSignIn && context.mounted) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => destination),
-      );
+      Navigator.push(context, MaterialPageRoute(builder: (_) => destination));
     }
     // If login was dismissed, do nothing — user stays where they are
     return;
@@ -31,10 +29,7 @@ Future<void> _navOrLogin(
 
   // Already logged in — go straight there
   if (context.mounted) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => destination),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => destination));
   }
 }
 
@@ -94,8 +89,7 @@ class _MainAppScreenState extends ConsumerState<MainAppScreen>
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6FA),
       body: FadeTransition(
-        opacity: CurvedAnimation(
-            parent: _tabAnim, curve: Curves.easeOut),
+        opacity: CurvedAnimation(parent: _tabAnim, curve: Curves.easeOut),
         child: IndexedStack(
           index: _currentTab,
           children: const [
@@ -117,8 +111,7 @@ class _MainAppScreenState extends ConsumerState<MainAppScreen>
 
 // ── Bottom Navigation ──────────────────────────────────────────────────────
 class _BottomNav extends StatelessWidget {
-  const _BottomNav(
-      {required this.currentIndex, required this.onTap});
+  const _BottomNav({required this.currentIndex, required this.onTap});
   final int currentIndex;
   final ValueChanged<int> onTap;
 
@@ -149,8 +142,7 @@ class _BottomNav extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 8, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: List.generate(_items.length, (i) {
@@ -168,10 +160,7 @@ class _BottomNav extends StatelessWidget {
                   decoration: BoxDecoration(
                     gradient: isActive
                         ? const LinearGradient(
-                            colors: [
-                              AppColors.primaryDark,
-                              AppColors.primary
-                            ],
+                            colors: [AppColors.primaryDark, AppColors.primary],
                           )
                         : null,
                     borderRadius: BorderRadius.circular(16),
@@ -182,9 +171,7 @@ class _BottomNav extends StatelessWidget {
                       Icon(
                         isActive ? active : inactive,
                         size: 22,
-                        color: isActive
-                            ? Colors.white
-                            : AppColors.hint,
+                        color: isActive ? Colors.white : AppColors.hint,
                       ),
                       if (isActive) ...[
                         const SizedBox(width: 6),
@@ -231,11 +218,14 @@ class _HomeTab extends ConsumerWidget {
           // ── Categories ──────────────────────────────────────
           Padding(
             padding: const EdgeInsets.only(left: 20, bottom: 14),
-            child: Text('Discover',
-                style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark)),
+            child: Text(
+              'Discover',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
           ),
           SizedBox(
             height: 92,
@@ -244,37 +234,45 @@ class _HomeTab extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(horizontal: 20),
               children: const [
                 _CategoryPill(
-                    icon: Icons.place_rounded,
-                    label: 'Destinations',
-                    gradientIndex: 0),
+                  icon: Icons.place_rounded,
+                  label: 'Destinations',
+                  gradientIndex: 0,
+                ),
                 _CategoryPill(
-                    icon: Icons.map_rounded,
-                    label: 'Itineraries',
-                    gradientIndex: 1),
+                  icon: Icons.map_rounded,
+                  label: 'Itineraries',
+                  gradientIndex: 1,
+                ),
                 _CategoryPill(
-                    icon: Icons.menu_book_rounded,
-                    label: 'Guides',
-                    gradientIndex: 2),
+                  icon: Icons.menu_book_rounded,
+                  label: 'Guides',
+                  gradientIndex: 2,
+                ),
                 _CategoryPill(
-                    icon: Icons.flight_rounded,
-                    label: 'Flights',
-                    gradientIndex: 3),
+                  icon: Icons.flight_rounded,
+                  label: 'Flights',
+                  gradientIndex: 3,
+                ),
                 _CategoryPill(
-                    icon: Icons.hotel_rounded,
-                    label: 'Hotels',
-                    gradientIndex: 4),
+                  icon: Icons.hotel_rounded,
+                  label: 'Hotels',
+                  gradientIndex: 4,
+                ),
                 _CategoryPill(
-                    icon: Icons.train_rounded,
-                    label: 'Trains',
-                    gradientIndex: 5),
+                  icon: Icons.train_rounded,
+                  label: 'Trains',
+                  gradientIndex: 5,
+                ),
                 _CategoryPill(
-                    icon: Icons.confirmation_number_rounded,
-                    label: 'Shows',
-                    gradientIndex: 0),
+                  icon: Icons.confirmation_number_rounded,
+                  label: 'Shows',
+                  gradientIndex: 0,
+                ),
                 _CategoryPill(
-                    icon: Icons.groups_rounded,
-                    label: 'Collab',
-                    gradientIndex: 1),
+                  icon: Icons.groups_rounded,
+                  label: 'Collab',
+                  gradientIndex: 1,
+                ),
               ],
             ),
           ),
@@ -303,8 +301,11 @@ class _HomeTab extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Icon(Icons.chevron_right_rounded,
-                    size: 18, color: AppColors.primary),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 18,
+                  color: AppColors.primary,
+                ),
                 Text(
                   'Swipe',
                   style: GoogleFonts.poppins(
@@ -328,8 +329,7 @@ class _HomeTab extends ConsumerWidget {
           const SizedBox(height: 28),
 
           // ── Top Destinations ─────────────────────────────────
-          _SectionHeader(
-              title: 'Top Destinations', onSeeAll: () {}),
+          _SectionHeader(title: 'Top Destinations', onSeeAll: () {}),
           const SizedBox(height: 14),
           SizedBox(
             height: 220,
@@ -340,16 +340,14 @@ class _HomeTab extends ConsumerWidget {
                 _FeaturedCard(
                   name: 'Manali',
                   tag: 'Mountains',
-                  imageUrl:
-                      'assets/images/manali.jpg',
+                  imageUrl: 'assets/images/manali.jpg',
                   rating: '4.9',
                   gradientIndex: 0,
                 ),
                 _FeaturedCard(
                   name: 'Udaipur',
                   tag: 'Heritage',
-                  imageUrl:
-                      'assets/images/udaipur.jpg',
+                  imageUrl: 'assets/images/udaipur.jpg',
                   rating: '4.8',
                   gradientIndex: 2,
                 ),
@@ -364,8 +362,7 @@ class _HomeTab extends ConsumerWidget {
                 _FeaturedCard(
                   name: 'Ladakh',
                   tag: 'Adventure',
-                  imageUrl:
-                      'assets/images/ladakh.jpg',
+                  imageUrl: 'assets/images/ladakh.jpg',
                   rating: '4.7',
                   gradientIndex: 3,
                 ),
@@ -376,8 +373,7 @@ class _HomeTab extends ConsumerWidget {
           const SizedBox(height: 28),
 
           // ── Popular Itineraries ───────────────────────────────
-          _SectionHeader(
-              title: 'Popular Itineraries', onSeeAll: () {}),
+          _SectionHeader(title: 'Popular Itineraries', onSeeAll: () {}),
           const SizedBox(height: 14),
           ...const [
             _ItineraryCard(
@@ -421,12 +417,32 @@ class _HomeTab extends ConsumerWidget {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               children: const [
-                _MiniGuideCard(name: 'Aarav', city: 'Delhi', specialty: 'Heritage'),
+                _MiniGuideCard(
+                  name: 'Aarav',
+                  city: 'Delhi',
+                  specialty: 'Heritage',
+                ),
                 _MiniGuideCard(name: 'Mira', city: 'Goa', specialty: 'Beaches'),
-                _MiniGuideCard(name: 'Kabir', city: 'Jaipur', specialty: 'Culture'),
-                _MiniGuideCard(name: 'Tara', city: 'Manali', specialty: 'Adventure'),
-                _MiniGuideCard(name: 'Ishan', city: 'Mumbai', specialty: 'Food'),
-                _MiniGuideCard(name: 'Naina', city: 'Kochi', specialty: 'Nature'),
+                _MiniGuideCard(
+                  name: 'Kabir',
+                  city: 'Jaipur',
+                  specialty: 'Culture',
+                ),
+                _MiniGuideCard(
+                  name: 'Tara',
+                  city: 'Manali',
+                  specialty: 'Adventure',
+                ),
+                _MiniGuideCard(
+                  name: 'Ishan',
+                  city: 'Mumbai',
+                  specialty: 'Food',
+                ),
+                _MiniGuideCard(
+                  name: 'Naina',
+                  city: 'Kochi',
+                  specialty: 'Nature',
+                ),
               ],
             ),
           ),
@@ -441,11 +457,31 @@ class _HomeTab extends ConsumerWidget {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               children: const [
-                _EventTypeCard(icon: Icons.mic_rounded, title: 'Stand-up', subtitle: 'Comedy nights'),
-                _EventTypeCard(icon: Icons.movie_rounded, title: 'Movies', subtitle: 'Cinema tickets'),
-                _EventTypeCard(icon: Icons.music_note_rounded, title: 'Concerts', subtitle: 'Live music'),
-                _EventTypeCard(icon: Icons.sports_cricket_rounded, title: 'Sports', subtitle: 'Match tickets'),
-                _EventTypeCard(icon: Icons.theater_comedy_rounded, title: 'Theatre', subtitle: 'Stage shows'),
+                _EventTypeCard(
+                  icon: Icons.mic_rounded,
+                  title: 'Stand-up',
+                  subtitle: 'Comedy nights',
+                ),
+                _EventTypeCard(
+                  icon: Icons.movie_rounded,
+                  title: 'Movies',
+                  subtitle: 'Cinema tickets',
+                ),
+                _EventTypeCard(
+                  icon: Icons.music_note_rounded,
+                  title: 'Concerts',
+                  subtitle: 'Live music',
+                ),
+                _EventTypeCard(
+                  icon: Icons.sports_cricket_rounded,
+                  title: 'Sports',
+                  subtitle: 'Match tickets',
+                ),
+                _EventTypeCard(
+                  icon: Icons.theater_comedy_rounded,
+                  title: 'Theatre',
+                  subtitle: 'Stage shows',
+                ),
               ],
             ),
           ),
@@ -523,8 +559,7 @@ class _HeroHeader extends ConsumerWidget {
                     children: [
                       Expanded(
                         child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
                               auth.isLoggedIn
@@ -562,11 +597,9 @@ class _HeroHeader extends ConsumerWidget {
                           height: 46,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white
-                                .withValues(alpha: 0.15),
+                            color: Colors.white.withValues(alpha: 0.15),
                             border: Border.all(
-                              color: Colors.white
-                                  .withValues(alpha: 0.3),
+                              color: Colors.white.withValues(alpha: 0.3),
                               width: 1.5,
                             ),
                           ),
@@ -586,95 +619,92 @@ class _HeroHeader extends ConsumerWidget {
 
                   // Search bar
                   Container(
-  height: 52,
-  decoration: BoxDecoration(
-    color: Colors.white.withValues(alpha: 0.12),
-    borderRadius: BorderRadius.circular(16),
-    border: Border.all(
-      color: Colors.white.withValues(alpha: 0.25),
-      width: 1.2,
-    ),
-    boxShadow: [
-      BoxShadow(
-        color: const Color(0xFF3D3B8E).withValues(alpha: 0.12),
-        blurRadius: 16,
-        offset: const Offset(0, 4),
-      ),
-      BoxShadow(
-        color: Colors.white.withValues(alpha: 0.08),
-        blurRadius: 6,
-        spreadRadius: -2,
-        offset: const Offset(-2, -2),
-      ),
-    ],
-  ),
-  child: Row(
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        child: Icon(Icons.search_rounded,
-            color: Colors.white.withValues(alpha: 0.8),
-            size: 22),
-      ),
-      Expanded(
-        child: Text(
-          'Search destinations, guides...',
-          style: GoogleFonts.poppins(
-            fontSize: 13,
-            color: Colors.white.withValues(alpha: 0.6),
-          ),
-        ),
-      ),
-      Container(
-        margin: const EdgeInsets.all(6),
-        padding: const EdgeInsets.symmetric(
-            horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.18),
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
-            width: 1,
-          ),
-        ),
-        child: Text(
-          'Search',
-          style: GoogleFonts.poppins(
-            fontSize: 12,
-            fontWeight: FontWeight.w600,
-            color: Colors.white,
-          ),
-        ),
-      ),
-    ],
-  ),
-),
+                    height: 52,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: Colors.white.withValues(alpha: 0.25),
+                        width: 1.2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: const Color(
+                            0xFF3D3B8E,
+                          ).withValues(alpha: 0.12),
+                          blurRadius: 16,
+                          offset: const Offset(0, 4),
+                        ),
+                        BoxShadow(
+                          color: Colors.white.withValues(alpha: 0.08),
+                          blurRadius: 6,
+                          spreadRadius: -2,
+                          offset: const Offset(-2, -2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14),
+                          child: Icon(
+                            Icons.search_rounded,
+                            color: Colors.white.withValues(alpha: 0.8),
+                            size: 22,
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(
+                            'Search destinations, guides...',
+                            style: GoogleFonts.poppins(
+                              fontSize: 13,
+                              color: Colors.white.withValues(alpha: 0.6),
+                            ),
+                          ),
+                        ),
+                        Container(
+                          margin: const EdgeInsets.all(6),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.3),
+                              width: 1,
+                            ),
+                          ),
+                          child: Text(
+                            'Search',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
                   const SizedBox(height: 16),
 
                   // Stats row
-// Stats row
-SingleChildScrollView(
-  scrollDirection: Axis.horizontal,
-  child: Row(
-    children: const [
-      _StatBadge(
-        value: '500+',
-        label: 'Destinations',
-      ),
-      SizedBox(width: 8),
-      _StatBadge(
-        value: '200+',
-        label: 'Itineraries',
-      ),
-      SizedBox(width: 8),
-      _StatBadge(
-        value: '4.9★',
-        label: 'Rated',
-      ),
-    ],
-  ),
-),
+                  // Stats row
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: const [
+                        _StatBadge(value: '500+', label: 'Destinations'),
+                        SizedBox(width: 8),
+                        _StatBadge(value: '200+', label: 'Itineraries'),
+                        SizedBox(width: 8),
+                        _StatBadge(value: '4.9★', label: 'Rated'),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -693,26 +723,28 @@ class _StatBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-          horizontal: 12, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2)),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(value,
-              style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white)),
+          Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+            ),
+          ),
           const SizedBox(width: 4),
-          Text(label,
-              style: GoogleFonts.poppins(
-                  fontSize: 11, color: Colors.white60)),
+          Text(
+            label,
+            style: GoogleFonts.poppins(fontSize: 11, color: Colors.white60),
+          ),
         ],
       ),
     );
@@ -732,35 +764,40 @@ class _ExploreTab extends StatefulWidget {
 class _ExploreTabState extends State<_ExploreTab> {
   int _activeFilter = 0;
   final _filters = [
-    'All', 'Mountains', 'Beaches', 'Heritage', 'Wildlife', 'Spiritual'
+    'All',
+    'Mountains',
+    'Beaches',
+    'Heritage',
+    'Wildlife',
+    'Spiritual',
   ];
 
   static const _places = [
-    ('Manali', 'Mountains', '4.9',
-        'assets/images/manali.jpg'),
-    ('Goa', 'Beaches', '4.7',
-        'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400'),
-    ('Hampi', 'Heritage', '4.8',
-        'assets/images/hampi.jpg'),
-    ('Ranthambore', 'Wildlife', '4.6',
-        'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=400'),
-    ('Varanasi', 'Spiritual', '4.9',
-        'assets/images/varanasi.jpg'),
-    ('Andaman', 'Beaches', '4.8',
-        'assets/images/andaman.jpg'),
-    ('Spiti', 'Mountains', '4.9',
-        'assets/images/spiti.jpg'),
-    ('Mysore', 'Heritage', '4.7',
-        'assets/images/mysore.jpg'),
+    ('Manali', 'Mountains', '4.9', 'assets/images/manali.jpg'),
+    (
+      'Goa',
+      'Beaches',
+      '4.7',
+      'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400',
+    ),
+    ('Hampi', 'Heritage', '4.8', 'assets/images/hampi.jpg'),
+    (
+      'Ranthambore',
+      'Wildlife',
+      '4.6',
+      'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=400',
+    ),
+    ('Varanasi', 'Spiritual', '4.9', 'assets/images/varanasi.jpg'),
+    ('Andaman', 'Beaches', '4.8', 'assets/images/andaman.jpg'),
+    ('Spiti', 'Mountains', '4.9', 'assets/images/spiti.jpg'),
+    ('Mysore', 'Heritage', '4.7', 'assets/images/mysore.jpg'),
   ];
 
   @override
   Widget build(BuildContext context) {
     final filtered = _activeFilter == 0
         ? _places
-        : _places
-            .where((p) => p.$2 == _filters[_activeFilter])
-            .toList();
+        : _places.where((p) => p.$2 == _filters[_activeFilter]).toList();
 
     return SafeArea(
       child: Column(
@@ -769,66 +806,73 @@ class _ExploreTabState extends State<_ExploreTab> {
           // Header
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-            child: Text('Explore India',
-                style: GoogleFonts.poppins(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textDark)),
+            child: Text(
+              'Explore India',
+              style: GoogleFonts.poppins(
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textDark,
+              ),
+            ),
           ),
           Padding(
-            padding:
-                const EdgeInsets.fromLTRB(20, 4, 20, 16),
-            child: Text('Discover your next adventure',
-                style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: AppColors.textLight)),
+            padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+            child: Text(
+              'Discover your next adventure',
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: AppColors.textLight,
+              ),
+            ),
           ),
 
           // Search
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Container(
-  height: 48,
-  decoration: BoxDecoration(
-color: const Color(0xFF3D6B9E).withValues(alpha: 0.07),
-borderRadius: BorderRadius.circular(14),
-border: Border.all(
-  color: const Color(0xFF5B92BE).withValues(alpha: 0.25),
-      width: 1.2,
-    ),
-    boxShadow: [
-      BoxShadow(
-        color: const Color(0xFF3D3B8E).withValues(alpha: 0.08),
-        blurRadius: 12,
-        spreadRadius: 1,
-        offset: const Offset(0, 3),
-      ),
-      BoxShadow(
-        color: Colors.white.withValues(alpha: 0.7),
-        blurRadius: 6,
-        spreadRadius: -2,
-        offset: const Offset(-2, -2),
-      ),
-    ],
-  ),
-  child: Row(
-    children: [
-      Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14),
-        child: Icon(Icons.search_rounded,
-            color: const Color(0xFF2A5480).withValues(alpha: 0.7),
-            size: 20),
-      ),
-      Text(
-        'Search destinations, guides...', // change text per tab
-        style: GoogleFonts.poppins(
-            fontSize: 13,
-            color: const Color(0xFF2A5480).withValues(alpha: 0.45)),
-      ),
-    ],
-  ),
-),
+              height: 48,
+              decoration: BoxDecoration(
+                color: const Color(0xFF3D6B9E).withValues(alpha: 0.07),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: const Color(0xFF5B92BE).withValues(alpha: 0.25),
+                  width: 1.2,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: const Color(0xFF3D3B8E).withValues(alpha: 0.08),
+                    blurRadius: 12,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 3),
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 0.7),
+                    blurRadius: 6,
+                    spreadRadius: -2,
+                    offset: const Offset(-2, -2),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 14),
+                    child: Icon(
+                      Icons.search_rounded,
+                      color: const Color(0xFF2A5480).withValues(alpha: 0.7),
+                      size: 20,
+                    ),
+                  ),
+                  Text(
+                    'Search destinations, guides...', // change text per tab
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: const Color(0xFF2A5480).withValues(alpha: 0.45),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
 
           const SizedBox(height: 16),
@@ -838,37 +882,30 @@ border: Border.all(
             height: 36,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               itemCount: _filters.length,
               itemBuilder: (_, i) => GestureDetector(
-                onTap: () =>
-                    setState(() => _activeFilter = i),
+                onTap: () => setState(() => _activeFilter = i),
                 child: AnimatedContainer(
-                  duration:
-                      const Duration(milliseconds: 200),
+                  duration: const Duration(milliseconds: 200),
                   margin: const EdgeInsets.only(right: 10),
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 8),
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     gradient: _activeFilter == i
-                        ? const LinearGradient(colors: [
-                            AppColors.primaryDark,
-                            AppColors.primary
-                          ])
+                        ? const LinearGradient(
+                            colors: [AppColors.primaryDark, AppColors.primary],
+                          )
                         : null,
-                    color: _activeFilter == i
-                        ? null
-                        : Colors.white,
-                    borderRadius:
-                        BorderRadius.circular(20),
+                    color: _activeFilter == i ? null : Colors.white,
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
                         color: _activeFilter == i
-                            ? AppColors.primary
-                                .withValues(alpha: 0.3)
-                            : Colors.black
-                                .withValues(alpha: 0.05),
+                            ? AppColors.primary.withValues(alpha: 0.3)
+                            : Colors.black.withValues(alpha: 0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -894,10 +931,8 @@ border: Border.all(
           // Grid
           Expanded(
             child: GridView.builder(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20),
-              gridDelegate:
-                  const SliverGridDelegateWithFixedCrossAxisCount(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 14,
                 mainAxisSpacing: 14,
@@ -935,25 +970,29 @@ class _ItineraryTab extends ConsumerWidget {
         children: [
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
-            child: Text('Itineraries',
-                style: GoogleFonts.poppins(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textDark)),
+            child: Text(
+              'Itineraries',
+              style: GoogleFonts.poppins(
+                fontSize: 26,
+                fontWeight: FontWeight.w800,
+                color: AppColors.textDark,
+              ),
+            ),
           ),
           Padding(
-            padding:
-                const EdgeInsets.fromLTRB(20, 0, 20, 20),
-            child: Text('Curated trips for every traveller',
-                style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: AppColors.textLight)),
+            padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
+            child: Text(
+              'Curated trips for every traveller',
+              style: GoogleFonts.poppins(
+                fontSize: 13,
+                color: AppColors.textLight,
+              ),
+            ),
           ),
 
           // Create CTA
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: GestureDetector(
               onTap: () async {
                 if (!isLoggedIn) {
@@ -967,8 +1006,8 @@ class _ItineraryTab extends ConsumerWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) =>
-                            const TravelDetailsScreen()),
+                      builder: (_) => const TravelDetailsScreen(),
+                    ),
                   );
                 }
               },
@@ -977,16 +1016,12 @@ class _ItineraryTab extends ConsumerWidget {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF1a3a5c),
-                      Color(0xFF3D6B9E)
-                    ],
+                    colors: [Color(0xFF1a3a5c), Color(0xFF3D6B9E)],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary
-                          .withValues(alpha: 0.35),
+                      color: AppColors.primary.withValues(alpha: 0.35),
                       blurRadius: 20,
                       offset: const Offset(0, 6),
                     ),
@@ -1002,8 +1037,7 @@ class _ItineraryTab extends ConsumerWidget {
                         child: Icon(
                           Icons.map_rounded,
                           size: 100,
-                          color: Colors.white
-                              .withValues(alpha: 0.06),
+                          color: Colors.white.withValues(alpha: 0.06),
                         ),
                       ),
                     ),
@@ -1015,29 +1049,25 @@ class _ItineraryTab extends ConsumerWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: Colors.white
-                                  .withValues(alpha: 0.15),
-                              borderRadius:
-                                  BorderRadius.circular(
-                                      14),
+                              color: Colors.white.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(14),
                             ),
                             child: const Icon(
-                                Icons.add_rounded,
-                                color: Colors.white,
-                                size: 28),
+                              Icons.add_rounded,
+                              color: Colors.white,
+                              size: 28,
+                            ),
                           ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: Column(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
                                   'Build Your Dream Trip',
                                   style: GoogleFonts.poppins(
                                     fontSize: 16,
-                                    fontWeight:
-                                        FontWeight.w700,
+                                    fontWeight: FontWeight.w700,
                                     color: Colors.white,
                                   ),
                                 ),
@@ -1052,9 +1082,10 @@ class _ItineraryTab extends ConsumerWidget {
                             ),
                           ),
                           const Icon(
-                              Icons.arrow_forward_ios_rounded,
-                              color: Colors.white60,
-                              size: 16),
+                            Icons.arrow_forward_ios_rounded,
+                            color: Colors.white60,
+                            size: 16,
+                          ),
                         ],
                       ),
                     ),
@@ -1068,18 +1099,20 @@ class _ItineraryTab extends ConsumerWidget {
 
           Padding(
             padding: const EdgeInsets.only(left: 20),
-            child: Text('Pre-built Itineraries',
-                style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark)),
+            child: Text(
+              'Pre-built Itineraries',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
           ),
           const SizedBox(height: 12),
 
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               children: const [
                 _ItineraryCard(
                   title: '7-Day Himalayan Trail',
@@ -1144,118 +1177,126 @@ class _GuidesTab extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
-            child: Text('Travel Blog',
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
+              child: Text(
+                'Travel Blog',
                 style: GoogleFonts.poppins(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textDark)),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.fromLTRB(20, 0, 20, 16),
-            child: Text('Stories, routes, tips, and city guides',
-                style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: AppColors.textLight)),
-          ),
-          Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black
-                        .withValues(alpha: 0.06),
-                    blurRadius: 12,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 14),
-                    child: Icon(Icons.search_rounded,
-                        color: AppColors.primary, size: 20),
-                  ),
-                  Text('Search guides...',
-                      style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          color: AppColors.hint)),
-                ],
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textDark,
+                ),
               ),
             ),
-          ),
-          SizedBox(
-            height: 38,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
+              child: Text(
+                'Stories, routes, tips, and city guides',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: AppColors.textLight,
+                ),
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: const [
-                _BlogFilter(label: 'All'),
-                _BlogFilter(label: 'Adventure'),
-                _BlogFilter(label: 'Budget'),
-                _BlogFilter(label: 'Food'),
-                _BlogFilter(label: 'Culture'),
-                _BlogFilter(label: 'Safety'),
-              ],
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.06),
+                      blurRadius: 12,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 14),
+                      child: Icon(
+                        Icons.search_rounded,
+                        color: AppColors.primary,
+                        size: 20,
+                      ),
+                    ),
+                    Text(
+                      'Search guides...',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: AppColors.hint,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 22),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: _BlogPostCard(
-              title: 'How to plan a peaceful 7-day Himachal route',
-              category: 'Adventure',
-              readTime: '6 min read',
-              excerpt:
-                  'A practical mountain itinerary with rest days, scenic stops, and safer transfers.',
-              gradientIndex: 0,
+            SizedBox(
+              height: 38,
+              child: ListView(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                children: const [
+                  _BlogFilter(label: 'All'),
+                  _BlogFilter(label: 'Adventure'),
+                  _BlogFilter(label: 'Budget'),
+                  _BlogFilter(label: 'Food'),
+                  _BlogFilter(label: 'Culture'),
+                  _BlogFilter(label: 'Safety'),
+                ],
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: _BlogPostCard(
-              title: 'Kerala beyond the usual backwater trip',
-              category: 'Nature',
-              readTime: '8 min read',
-              excerpt:
-                  'Slow travel ideas across Kochi, Alleppey, Munnar, local food, and monsoon timing.',
-              gradientIndex: 4,
+            const SizedBox(height: 22),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _BlogPostCard(
+                title: 'How to plan a peaceful 7-day Himachal route',
+                category: 'Adventure',
+                readTime: '6 min read',
+                excerpt:
+                    'A practical mountain itinerary with rest days, scenic stops, and safer transfers.',
+                gradientIndex: 0,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: _BlogPostCard(
-              title: 'Rajasthan on a student budget',
-              category: 'Budget',
-              readTime: '5 min read',
-              excerpt:
-                  'Where to stay, what to skip, and how to stretch your budget across Jaipur and Udaipur.',
-              gradientIndex: 1,
+            const SizedBox(height: 12),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _BlogPostCard(
+                title: 'Kerala beyond the usual backwater trip',
+                category: 'Nature',
+                readTime: '8 min read',
+                excerpt:
+                    'Slow travel ideas across Kochi, Alleppey, Munnar, local food, and monsoon timing.',
+                gradientIndex: 4,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: _BlogPostCard(
-              title: 'Solo travel safety checklist for India',
-              category: 'Safety',
-              readTime: '7 min read',
-              excerpt:
-                  'Simple rules for arrivals, transport, sharing plans, and avoiding stressful surprises.',
-              gradientIndex: 3,
+            const SizedBox(height: 12),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _BlogPostCard(
+                title: 'Rajasthan on a student budget',
+                category: 'Budget',
+                readTime: '5 min read',
+                excerpt:
+                    'Where to stay, what to skip, and how to stretch your budget across Jaipur and Udaipur.',
+                gradientIndex: 1,
+              ),
             ),
-          ),
+            const SizedBox(height: 12),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              child: _BlogPostCard(
+                title: 'Solo travel safety checklist for India',
+                category: 'Safety',
+                readTime: '7 min read',
+                excerpt:
+                    'Simple rules for arrivals, transport, sharing plans, and avoiding stressful surprises.',
+                gradientIndex: 3,
+              ),
+            ),
           ],
         ),
       ),
@@ -1279,15 +1320,17 @@ class _ProfileTab extends ConsumerWidget {
           children: [
             // Mini header
             Padding(
-              padding:
-                  const EdgeInsets.fromLTRB(20, 24, 20, 0),
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Profile',
-                    style: GoogleFonts.poppins(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        color: AppColors.textDark)),
+                child: Text(
+                  'Profile',
+                  style: GoogleFonts.poppins(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.textDark,
+                  ),
+                ),
               ),
             ),
 
@@ -1296,51 +1339,69 @@ class _ProfileTab extends ConsumerWidget {
             // Greyscale avatar
             ColorFiltered(
               colorFilter: const ColorFilter.matrix([
-                0.2126, 0.7152, 0.0722, 0, 0,
-                0.2126, 0.7152, 0.0722, 0, 0,
-                0.2126, 0.7152, 0.0722, 0, 0,
-                0, 0, 0, 1, 0,
+                0.2126,
+                0.7152,
+                0.0722,
+                0,
+                0,
+                0.2126,
+                0.7152,
+                0.0722,
+                0,
+                0,
+                0.2126,
+                0.7152,
+                0.0722,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
               ]),
               child: Container(
                 width: 110,
                 height: 110,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      Colors.grey.shade300,
-                      Colors.grey.shade400
-                    ],
+                    colors: [Colors.grey.shade300, Colors.grey.shade400],
                   ),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(Icons.person_rounded,
-                    size: 60,
-                    color: Colors.grey.shade600),
+                child: Icon(
+                  Icons.person_rounded,
+                  size: 60,
+                  color: Colors.grey.shade600,
+                ),
               ),
             ),
 
             const SizedBox(height: 20),
 
-            Text('Sign in to your account',
-                style: GoogleFonts.poppins(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark)),
+            Text(
+              'Sign in to your account',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
             const SizedBox(height: 8),
             Text(
               'Access bookings, saved trips,\nand personalised recommendations',
               style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: AppColors.textLight,
-                  height: 1.5),
+                fontSize: 13,
+                color: AppColors.textLight,
+                height: 1.5,
+              ),
               textAlign: TextAlign.center,
             ),
 
             const SizedBox(height: 36),
 
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 36),
+              padding: const EdgeInsets.symmetric(horizontal: 36),
               child: Column(
                 children: [
                   // Sign In
@@ -1349,17 +1410,12 @@ class _ProfileTab extends ConsumerWidget {
                     height: 54,
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [
-                          AppColors.primaryDark,
-                          AppColors.primary
-                        ],
+                        colors: [AppColors.primaryDark, AppColors.primary],
                       ),
-                      borderRadius:
-                          BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary
-                              .withValues(alpha: 0.35),
+                          color: AppColors.primary.withValues(alpha: 0.35),
                           blurRadius: 16,
                           offset: const Offset(0, 4),
                         ),
@@ -1368,8 +1424,7 @@ class _ProfileTab extends ConsumerWidget {
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        borderRadius:
-                            BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(16),
                         onTap: () async {
                           final didSignIn = await showAuthSheet(context);
                           if (didSignIn && context.mounted) {
@@ -1377,12 +1432,14 @@ class _ProfileTab extends ConsumerWidget {
                           }
                         },
                         child: Center(
-                          child: Text('Sign In',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight:
-                                      FontWeight.w600,
-                                  color: Colors.white)),
+                          child: Text(
+                            'Sign In',
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -1394,17 +1451,13 @@ class _ProfileTab extends ConsumerWidget {
                     height: 54,
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius:
-                          BorderRadius.circular(16),
-                      border: Border.all(
-                          color: AppColors.primary,
-                          width: 1.5),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.primary, width: 1.5),
                     ),
                     child: Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        borderRadius:
-                            BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(16),
                         onTap: () async {
                           final didSignIn = await showAuthSheet(
                             context,
@@ -1415,13 +1468,14 @@ class _ProfileTab extends ConsumerWidget {
                           }
                         },
                         child: Center(
-                          child: Text('Create Account',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 15,
-                                  fontWeight:
-                                      FontWeight.w600,
-                                  color:
-                                      AppColors.primary)),
+                          child: Text(
+                            'Create Account',
+                            style: GoogleFonts.poppins(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -1448,18 +1502,14 @@ class _ProfileTab extends ConsumerWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFF1a3a5c),
-                    Color(0xFF3D6B9E)
-                  ],
+                  colors: [Color(0xFF1a3a5c), Color(0xFF3D6B9E)],
                 ),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
                 ),
               ),
-              padding:
-                  const EdgeInsets.fromLTRB(20, 32, 20, 32),
+              padding: const EdgeInsets.fromLTRB(20, 32, 20, 32),
               child: Column(
                 children: [
                   Container(
@@ -1467,17 +1517,17 @@ class _ProfileTab extends ConsumerWidget {
                     height: 80,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white
-                          .withValues(alpha: 0.2),
+                      color: Colors.white.withValues(alpha: 0.2),
                       border: Border.all(
-                          color: Colors.white
-                              .withValues(alpha: 0.4),
-                          width: 2),
+                        color: Colors.white.withValues(alpha: 0.4),
+                        width: 2,
+                      ),
                     ),
                     child: const Icon(
-                        Icons.person_rounded,
-                        size: 44,
-                        color: Colors.white),
+                      Icons.person_rounded,
+                      size: 44,
+                      color: Colors.white,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -1485,15 +1535,17 @@ class _ProfileTab extends ConsumerWidget {
                         ? auth.name!
                         : auth.userEmail?.split('@').first ?? 'Traveller',
                     style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white),
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
                   ),
                   Text(
                     auth.userEmail ?? '',
                     style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: Colors.white60),
+                      fontSize: 13,
+                      color: Colors.white60,
+                    ),
                   ),
                 ],
               ),
@@ -1503,60 +1555,69 @@ class _ProfileTab extends ConsumerWidget {
 
             // Menu items
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
                 children: [
-_ProfileTile(
-    icon: Icons.receipt_long_rounded,
-    label: 'My Bookings',
-    gradientIndex: 0,
-    subtitle: 'View all your trips'),
-_ProfileTile(
-    icon: Icons.bookmark_rounded,
-    label: 'Saved Trips',
-    gradientIndex: 1,
-    subtitle: 'Places you want to visit'),
-_ProfileTile(
-    icon: Icons.map_rounded,
-    label: 'My Itineraries',
-    gradientIndex: 2,
-    subtitle: 'Your custom travel plans'),
-_ProfileTile(
-    icon: Icons.star_rounded,
-    label: 'Reviews & Ratings',
-    gradientIndex: 3,
-    subtitle: 'Trips you have reviewed'),
-_ProfileTile(
-    icon: Icons.card_travel_rounded,
-    label: 'Travel Preferences',
-    gradientIndex: 0,
-    subtitle: 'Customise your experience'),
-_ProfileTile(
-    icon: Icons.people_rounded,
-    label: 'Travel Companions',
-    gradientIndex: 1,
-    subtitle: 'Friends and family'),
-_ProfileTile(
-    icon: Icons.wallet_rounded,
-    label: 'Payments & Wallet',
-    gradientIndex: 2,
-    subtitle: 'Manage payment methods'),
-_ProfileTile(
-    icon: Icons.notifications_rounded,
-    label: 'Notifications',
-    gradientIndex: 3,
-    subtitle: 'Alerts and updates'),
-_ProfileTile(
-    icon: Icons.help_outline_rounded,
-    label: 'Help & Support',
-    gradientIndex: 4,
-    subtitle: 'FAQs and contact us'),
-_ProfileTile(
-    icon: Icons.settings_rounded,
-    label: 'Settings',
-    gradientIndex: 5,
-    subtitle: 'App preferences'),
+                  _ProfileTile(
+                    icon: Icons.receipt_long_rounded,
+                    label: 'My Bookings',
+                    gradientIndex: 0,
+                    subtitle: 'View all your trips',
+                  ),
+                  _ProfileTile(
+                    icon: Icons.bookmark_rounded,
+                    label: 'Saved Trips',
+                    gradientIndex: 1,
+                    subtitle: 'Places you want to visit',
+                  ),
+                  _ProfileTile(
+                    icon: Icons.map_rounded,
+                    label: 'My Itineraries',
+                    gradientIndex: 2,
+                    subtitle: 'Your custom travel plans',
+                  ),
+                  _ProfileTile(
+                    icon: Icons.star_rounded,
+                    label: 'Reviews & Ratings',
+                    gradientIndex: 3,
+                    subtitle: 'Trips you have reviewed',
+                  ),
+                  _ProfileTile(
+                    icon: Icons.card_travel_rounded,
+                    label: 'Travel Preferences',
+                    gradientIndex: 0,
+                    subtitle: 'Customise your experience',
+                  ),
+                  _ProfileTile(
+                    icon: Icons.people_rounded,
+                    label: 'Travel Companions',
+                    gradientIndex: 1,
+                    subtitle: 'Friends and family',
+                  ),
+                  _ProfileTile(
+                    icon: Icons.wallet_rounded,
+                    label: 'Payments & Wallet',
+                    gradientIndex: 2,
+                    subtitle: 'Manage payment methods',
+                  ),
+                  _ProfileTile(
+                    icon: Icons.notifications_rounded,
+                    label: 'Notifications',
+                    gradientIndex: 3,
+                    subtitle: 'Alerts and updates',
+                  ),
+                  _ProfileTile(
+                    icon: Icons.help_outline_rounded,
+                    label: 'Help & Support',
+                    gradientIndex: 4,
+                    subtitle: 'FAQs and contact us',
+                  ),
+                  _ProfileTile(
+                    icon: Icons.settings_rounded,
+                    label: 'Settings',
+                    gradientIndex: 5,
+                    subtitle: 'App preferences',
+                  ),
                 ],
               ),
             ),
@@ -1565,33 +1626,34 @@ _ProfileTile(
 
             // Logout
             Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 20),
+              padding: const EdgeInsets.symmetric(horizontal: 20),
               child: GestureDetector(
-                onTap: () =>
-                    ref.read(authProvider.notifier).logout(),
+                onTap: () => ref.read(authProvider.notifier).logout(),
                 child: Container(
                   width: double.infinity,
                   height: 52,
                   decoration: BoxDecoration(
                     color: Colors.red.shade50,
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(
-                        color: Colors.red.shade200),
+                    border: Border.all(color: Colors.red.shade200),
                   ),
                   child: Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.logout_rounded,
-                          color: Colors.red.shade400,
-                          size: 20),
+                      Icon(
+                        Icons.logout_rounded,
+                        color: Colors.red.shade400,
+                        size: 20,
+                      ),
                       const SizedBox(width: 10),
-                      Text('Log Out',
-                          style: GoogleFonts.poppins(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.red.shade400)),
+                      Text(
+                        'Log Out',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.red.shade400,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1610,8 +1672,7 @@ _ProfileTile(
 // ═══════════════════════════════════════════════════════════════════════════
 
 class _SectionHeader extends StatelessWidget {
-  const _SectionHeader(
-      {required this.title, required this.onSeeAll});
+  const _SectionHeader({required this.title, required this.onSeeAll});
   final String title;
   final VoidCallback onSeeAll;
 
@@ -1622,26 +1683,30 @@ class _SectionHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(title,
-              style: GoogleFonts.poppins(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textDark)),
+          Text(
+            title,
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textDark,
+            ),
+          ),
           GestureDetector(
             onTap: onSeeAll,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 12, vertical: 6),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.primary
-                    .withValues(alpha: 0.08),
+                color: AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: Text('See all',
-                  style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      color: AppColors.primary,
-                      fontWeight: FontWeight.w600)),
+              child: Text(
+                'See all',
+                style: GoogleFonts.poppins(
+                  fontSize: 12,
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ),
         ],
@@ -1662,13 +1727,13 @@ class _CategoryPill extends ConsumerWidget {
 
   static const _destinations = {
     'Destinations': (Icons.place_rounded, 'Browse Destinations'),
-    'Itineraries':  (Icons.map_rounded,   'Itineraries'),
-    'Guides':       (Icons.menu_book_rounded, 'Travel Guides'),
-    'Flights':      (Icons.flight_rounded,  'Book Flights'),
-    'Hotels':       (Icons.hotel_rounded,   'Find Hotels'),
-    'Trains':       (Icons.train_rounded,   'Book Trains'),
-    'Shows':        (Icons.confirmation_number_rounded, 'Shows & Events'),
-    'Collab':       (Icons.groups_rounded, 'Plan Together'),
+    'Itineraries': (Icons.map_rounded, 'Itineraries'),
+    'Guides': (Icons.menu_book_rounded, 'Travel Guides'),
+    'Flights': (Icons.flight_rounded, 'Book Flights'),
+    'Hotels': (Icons.hotel_rounded, 'Find Hotels'),
+    'Trains': (Icons.train_rounded, 'Book Trains'),
+    'Shows': (Icons.confirmation_number_rounded, 'Shows & Events'),
+    'Collab': (Icons.groups_rounded, 'Plan Together'),
   };
 
   @override
@@ -1714,18 +1779,23 @@ class _CategoryPill extends ConsumerWidget {
                   ),
                 ],
               ),
-              child: Icon(icon,
-                  color: const Color(0xFF2A5480).withValues(alpha: 0.85),
-                  size: 26),
+              child: Icon(
+                icon,
+                color: const Color(0xFF2A5480).withValues(alpha: 0.85),
+                size: 26,
+              ),
             ),
             const SizedBox(height: 8),
-            Text(label,
-                style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textDark),
-                textAlign: TextAlign.center,
-                maxLines: 1),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: AppColors.textDark,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+            ),
           ],
         ),
       ),
@@ -1751,7 +1821,8 @@ class _PlanJourneyCTA extends ConsumerWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (_) => const TravelDetailsScreen()),
+              builder: (_) => const ItineraryQuestionnaireScreen(),
+            ),
           );
         }
       },
@@ -1759,9 +1830,8 @@ class _PlanJourneyCTA extends ConsumerWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
-  BoxShadow(
-    color: const Color(0xFF1D3F63)
-        .withValues(alpha: 0.35),
+            BoxShadow(
+              color: const Color(0xFF1D3F63).withValues(alpha: 0.35),
               blurRadius: 20,
               offset: const Offset(0, 6),
             ),
@@ -1777,10 +1847,7 @@ class _PlanJourneyCTA extends ConsumerWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-  Color(0xFF2A5480),
-  Color(0xFF0F2744)
-],
+                    colors: [Color(0xFF2A5480), Color(0xFF0F2744)],
                   ),
                 ),
               ),
@@ -1789,10 +1856,11 @@ class _PlanJourneyCTA extends ConsumerWidget {
                 bottom: -20,
                 child: Transform.rotate(
                   angle: -math.pi / 8,
-                  child: Icon(Icons.flight_rounded,
-                      size: 120,
-                      color: Colors.white
-                          .withValues(alpha: 0.08)),
+                  child: Icon(
+                    Icons.flight_rounded,
+                    size: 120,
+                    color: Colors.white.withValues(alpha: 0.08),
+                  ),
                 ),
               ),
               Padding(
@@ -1801,15 +1869,16 @@ class _PlanJourneyCTA extends ConsumerWidget {
                   children: [
                     Expanded(
                       child: Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Plan Your Journey',
-                              style: GoogleFonts.poppins(
-                                  fontSize: 18,
-                                  fontWeight:
-                                      FontWeight.w800,
-                                  color: Colors.white)),
+                          Text(
+                            'Plan Your Journey',
+                            style: GoogleFonts.poppins(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.white,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -1817,14 +1886,14 @@ class _PlanJourneyCTA extends ConsumerWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.white
-                            .withValues(alpha: 0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
-                          Icons.arrow_forward_rounded,
-                          color: Colors.white,
-                          size: 22),
+                        Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: 22,
+                      ),
                     ),
                   ],
                 ),
@@ -1876,30 +1945,42 @@ class _SmartGuideMatchCard extends ConsumerWidget {
                 color: Colors.white.withValues(alpha: 0.16),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Icon(Icons.auto_awesome_rounded,
-                  color: Colors.white, size: 24),
+              child: const Icon(
+                Icons.auto_awesome_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Smart Guide Match',
-                      style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white)),
+                  Text(
+                    'Smart Guide Match',
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white,
+                    ),
+                  ),
                   const SizedBox(height: 3),
-                  Text('Let the app choose a guide for your route and style',
-                      style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          color: Colors.white70,
-                          height: 1.35)),
+                  Text(
+                    'Let the app choose a guide for your route and style',
+                    style: GoogleFonts.poppins(
+                      fontSize: 11,
+                      color: Colors.white70,
+                      height: 1.35,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_rounded,
-                color: Colors.white, size: 20),
+            const Icon(
+              Icons.arrow_forward_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
           ],
         ),
       ),
@@ -1960,20 +2041,30 @@ class _MiniGuideCard extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
-            Text(name,
-                style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark)),
-            Text(city,
-                style: GoogleFonts.poppins(
-                    fontSize: 11, color: AppColors.textLight)),
+            Text(
+              name,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+            Text(
+              city,
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                color: AppColors.textLight,
+              ),
+            ),
             const Spacer(),
-            Text(specialty,
-                style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary)),
+            Text(
+              specialty,
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
           ],
         ),
       ),
@@ -2026,14 +2117,21 @@ class _EventTypeCard extends ConsumerWidget {
               child: Icon(icon, color: AppColors.primary, size: 22),
             ),
             const Spacer(),
-            Text(title,
-                style: GoogleFonts.poppins(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark)),
-            Text(subtitle,
-                style: GoogleFonts.poppins(
-                    fontSize: 11, color: AppColors.textLight)),
+            Text(
+              title,
+              style: GoogleFonts.poppins(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+            Text(
+              subtitle,
+              style: GoogleFonts.poppins(
+                fontSize: 11,
+                color: AppColors.textLight,
+              ),
+            ),
           ],
         ),
       ),
@@ -2048,7 +2146,10 @@ class _CollaborationSection extends StatelessWidget {
       spacing: 10,
       runSpacing: 10,
       children: const [
-        _CollabChip(icon: Icons.business_center_rounded, label: 'Business trips'),
+        _CollabChip(
+          icon: Icons.business_center_rounded,
+          label: 'Business trips',
+        ),
         _CollabChip(icon: Icons.school_rounded, label: 'School trips'),
         _CollabChip(icon: Icons.groups_rounded, label: 'Friends'),
         _CollabChip(icon: Icons.family_restroom_rounded, label: 'Family'),
@@ -2088,11 +2189,14 @@ class _CollabChip extends ConsumerWidget {
           children: [
             Icon(icon, size: 17, color: AppColors.primary),
             const SizedBox(width: 7),
-            Text(label,
-                style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary)),
+            Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.primary,
+              ),
+            ),
           ],
         ),
       ),
@@ -2116,8 +2220,7 @@ class _FeaturedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = _tagGradients[
-        gradientIndex % _tagGradients.length];
+    final colors = _tagGradients[gradientIndex % _tagGradients.length];
 
     return Container(
       width: 165,
@@ -2137,15 +2240,17 @@ class _FeaturedCard extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-imageUrl.startsWith('assets/')
-    ? Image.asset(imageUrl, fit: BoxFit.cover)
-    : Image.network(imageUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: colors),
-          ),
-        )),
+            imageUrl.startsWith('assets/')
+                ? Image.asset(imageUrl, fit: BoxFit.cover)
+                : Image.network(
+                    imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: colors),
+                      ),
+                    ),
+                  ),
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
@@ -2163,42 +2268,47 @@ imageUrl.startsWith('assets/')
               top: 10,
               left: 10,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                      colors: colors),
+                  gradient: LinearGradient(colors: colors),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Text(tag,
-                    style: GoogleFonts.poppins(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white)),
+                child: Text(
+                  tag,
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
               ),
             ),
             Positioned(
               top: 10,
               right: 10,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 6, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black
-                      .withValues(alpha: 0.45),
+                  color: Colors.black.withValues(alpha: 0.45),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.star_rounded,
-                        size: 11, color: Colors.amber),
+                    const Icon(
+                      Icons.star_rounded,
+                      size: 11,
+                      color: Colors.amber,
+                    ),
                     const SizedBox(width: 2),
-                    Text(rating,
-                        style: GoogleFonts.poppins(
-                            fontSize: 10,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w700)),
+                    Text(
+                      rating,
+                      style: GoogleFonts.poppins(
+                        fontSize: 10,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -2207,11 +2317,14 @@ imageUrl.startsWith('assets/')
               bottom: 12,
               left: 12,
               right: 12,
-              child: Text(name,
-                  style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white)),
+              child: Text(
+                name,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ],
         ),
@@ -2239,8 +2352,7 @@ class _ItineraryCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // ignore: unused_local_variable
-    final colors = _tagGradients[
-        gradientIndex % _tagGradients.length];
+    final colors = _tagGradients[gradientIndex % _tagGradients.length];
     final isLoggedIn = ref.watch(authProvider).isLoggedIn;
 
     return Container(
@@ -2256,7 +2368,7 @@ class _ItineraryCard extends ConsumerWidget {
           ),
         ],
       ),
-child: IntrinsicHeight(
+      child: IntrinsicHeight(
         child: Row(
           children: [
             // Color accent strip
@@ -2274,136 +2386,156 @@ child: IntrinsicHeight(
                 ),
               ),
             ),
-          // Icon
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
+            // Icon
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
                       colors[0].withValues(alpha: 0.15),
                       colors[1].withValues(alpha: 0.15),
-                    ]),
-                borderRadius: BorderRadius.circular(14),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(Icons.route_rounded, color: colors[0], size: 24),
               ),
-              child: Icon(Icons.route_rounded,
-                  color: colors[0], size: 24),
             ),
-          ),
-          // Text
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  vertical: 14),
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
-                children: [
-                  Text(title,
+            // Text
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
                       style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.textDark)),
-                  const SizedBox(height: 2),
-                  Text(subtitle,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
                       style: GoogleFonts.poppins(
-                          fontSize: 11,
-                          color: AppColors.textLight)),
-                  const SizedBox(height: 6),
-                  Row(children: [
-                    Icon(Icons.schedule_rounded,
-                        size: 11, color: colors[0]),
-                    const SizedBox(width: 3),
-                    Text(duration,
-                        style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.schedule_rounded,
+                          size: 11,
+                          color: colors[0],
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          duration,
+                          style: GoogleFonts.poppins(
                             fontSize: 11,
                             color: colors[0],
-                            fontWeight: FontWeight.w500)),
-                    const SizedBox(width: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [
-                              colors[0]
-                                  .withValues(alpha: 0.15),
-                              colors[1]
-                                  .withValues(alpha: 0.15),
-                            ]),
-                        borderRadius:
-                            BorderRadius.circular(6),
-                      ),
-                      child: Text(tag,
-                          style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 2,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                colors[0].withValues(alpha: 0.15),
+                                colors[1].withValues(alpha: 0.15),
+                              ],
+                            ),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            tag,
+                            style: GoogleFonts.poppins(
                               fontSize: 10,
                               fontWeight: FontWeight.w600,
-                              color: colors[0])),
-                    ),
-                  ]),
-                ],
-              ),
-            ),
-          ),
-          // Price + Book
-          Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (isLoggedIn) ...[
-                  Text(price,
-                      style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w800,
-                          color: AppColors.primary)),
-                  const SizedBox(height: 6),
-                ],
-                GestureDetector(
-onTap: () => _navOrLogin(
-  context,
-  ref,
-  PlaceholderScreen(
-    title: 'Book $title',
-    icon: Icons.receipt_long_rounded,
-    subtitle: 'Complete your booking for $title',
-  ),
-),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                          colors: colors),
-                      borderRadius:
-                          BorderRadius.circular(10),
-                      boxShadow: [
-                        BoxShadow(
-                          color: colors[0]
-                              .withValues(alpha: 0.35),
-                          blurRadius: 8,
-                          offset: const Offset(0, 3),
+                              color: colors[0],
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    child: Text('Book',
-                        style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: Colors.white)),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ],
+            // Price + Book
+            Padding(
+              padding: const EdgeInsets.all(14),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (isLoggedIn) ...[
+                    Text(
+                      price,
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                  ],
+                  GestureDetector(
+                    onTap: () => _navOrLogin(
+                      context,
+                      ref,
+                      PlaceholderScreen(
+                        title: 'Book $title',
+                        icon: Icons.receipt_long_rounded,
+                        subtitle: 'Complete your booking for $title',
+                      ),
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(colors: colors),
+                        borderRadius: BorderRadius.circular(10),
+                        boxShadow: [
+                          BoxShadow(
+                            color: colors[0].withValues(alpha: 0.35),
+                            blurRadius: 8,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Text(
+                        'Book',
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
-),
+      ),
     );
   }
 }
@@ -2424,21 +2556,24 @@ class _ExploreGridCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = _tagGradients[
-        gradientIndex % _tagGradients.length];
+    final colors = _tagGradients[gradientIndex % _tagGradients.length];
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: Stack(
         fit: StackFit.expand,
         children: [
-imageUrl.startsWith('assets/')
-    ? Image.asset(imageUrl, fit: BoxFit.cover)
-    : Image.network(imageUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (_, __, ___) => Container(
-            decoration: BoxDecoration(
-                gradient: LinearGradient(colors: colors)))),
+          imageUrl.startsWith('assets/')
+              ? Image.asset(imageUrl, fit: BoxFit.cover)
+              : Image.network(
+                  imageUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(colors: colors),
+                    ),
+                  ),
+                ),
           DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -2456,8 +2591,7 @@ imageUrl.startsWith('assets/')
             top: 10,
             right: 10,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 6, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: colors),
                 borderRadius: BorderRadius.circular(8),
@@ -2465,14 +2599,16 @@ imageUrl.startsWith('assets/')
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.star_rounded,
-                      size: 10, color: Colors.white),
+                  const Icon(Icons.star_rounded, size: 10, color: Colors.white),
                   const SizedBox(width: 2),
-                  Text(rating,
-                      style: GoogleFonts.poppins(
-                          fontSize: 10,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700)),
+                  Text(
+                    rating,
+                    style: GoogleFonts.poppins(
+                      fontSize: 10,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -2484,15 +2620,21 @@ imageUrl.startsWith('assets/')
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                    style: GoogleFonts.poppins(
-                        fontSize: 15,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white)),
-                Text(tag,
-                    style: GoogleFonts.poppins(
-                        fontSize: 11,
-                        color: Colors.white70)),
+                Text(
+                  name,
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
+                ),
+                Text(
+                  tag,
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: Colors.white70,
+                  ),
+                ),
               ],
             ),
           ),
@@ -2516,9 +2658,7 @@ class _BlogFilter extends StatelessWidget {
       decoration: BoxDecoration(
         color: isAll ? AppColors.primary : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isAll ? AppColors.primary : AppColors.border,
-        ),
+        border: Border.all(color: isAll ? AppColors.primary : AppColors.border),
       ),
       child: Text(
         label,
@@ -2633,8 +2773,11 @@ class _BlogPostCard extends ConsumerWidget {
                   ),
                 ),
                 const SizedBox(width: 4),
-                const Icon(Icons.arrow_forward_rounded,
-                    size: 15, color: AppColors.primary),
+                const Icon(
+                  Icons.arrow_forward_rounded,
+                  size: 15,
+                  color: AppColors.primary,
+                ),
               ],
             ),
           ],
@@ -2660,19 +2803,18 @@ class _GuideCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // ignore: unused_local_variable
-    final colors = _tagGradients[
-        gradientIndex % _tagGradients.length];
+    final colors = _tagGradients[gradientIndex % _tagGradients.length];
 
     return GestureDetector(
-onTap: () => _navOrLogin(
-  context,
-  ref,
-  PlaceholderScreen(
-    title: title,
-    icon: Icons.article_rounded,
-    subtitle: '$readTime • $category',
-  ),
-),
+      onTap: () => _navOrLogin(
+        context,
+        ref,
+        PlaceholderScreen(
+          title: title,
+          icon: Icons.article_rounded,
+          subtitle: '$readTime • $category',
+        ),
+      ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(16),
@@ -2681,8 +2823,7 @@ onTap: () => _navOrLogin(
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color:
-                  Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 12,
               offset: const Offset(0, 3),
             ),
@@ -2695,71 +2836,78 @@ onTap: () => _navOrLogin(
               height: 52,
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: colors),
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: colors,
+                ),
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color:
-                        colors[0].withValues(alpha: 0.3),
+                    color: colors[0].withValues(alpha: 0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
                 ],
               ),
               child: const Icon(
-                  Icons.article_rounded,
-                  color: Colors.white,
-                  size: 24),
+                Icons.article_rounded,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: GoogleFonts.poppins(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textDark)),
+                  Text(
+                    title,
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textDark,
+                    ),
+                  ),
                   const SizedBox(height: 6),
                   Row(
                     children: [
                       Container(
-                        padding:
-                            const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                              colors: [
-                                colors[0].withValues(
-                                    alpha: 0.15),
-                                colors[1].withValues(
-                                    alpha: 0.15),
-                              ]),
-                          borderRadius:
-                              BorderRadius.circular(6),
+                            colors: [
+                              colors[0].withValues(alpha: 0.15),
+                              colors[1].withValues(alpha: 0.15),
+                            ],
+                          ),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                        child: Text(category,
-                            style: GoogleFonts.poppins(
-                                fontSize: 10,
-                                fontWeight:
-                                    FontWeight.w600,
-                                color: colors[0])),
+                        child: Text(
+                          category,
+                          style: GoogleFonts.poppins(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                            color: colors[0],
+                          ),
+                        ),
                       ),
                       const SizedBox(width: 8),
-                      Icon(Icons.schedule_rounded,
-                          size: 11,
-                          color: AppColors.textLight),
+                      Icon(
+                        Icons.schedule_rounded,
+                        size: 11,
+                        color: AppColors.textLight,
+                      ),
                       const SizedBox(width: 3),
-                      Text(readTime,
-                          style: GoogleFonts.poppins(
-                              fontSize: 11,
-                              color:
-                                  AppColors.textLight)),
+                      Text(
+                        readTime,
+                        style: GoogleFonts.poppins(
+                          fontSize: 11,
+                          color: AppColors.textLight,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -2769,14 +2917,19 @@ onTap: () => _navOrLogin(
               width: 32,
               height: 32,
               decoration: BoxDecoration(
-                gradient: LinearGradient(colors: [
-                  colors[0].withValues(alpha: 0.12),
-                  colors[1].withValues(alpha: 0.12),
-                ]),
+                gradient: LinearGradient(
+                  colors: [
+                    colors[0].withValues(alpha: 0.12),
+                    colors[1].withValues(alpha: 0.12),
+                  ],
+                ),
                 shape: BoxShape.circle,
               ),
-              child: Icon(Icons.arrow_forward_rounded,
-                  size: 16, color: colors[0]),
+              child: Icon(
+                Icons.arrow_forward_rounded,
+                size: 16,
+                color: colors[0],
+              ),
             ),
           ],
         ),
@@ -2800,23 +2953,17 @@ class _ProfileTile extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // ignore: unused_local_variable
-    final colors = _tagGradients[
-        gradientIndex % _tagGradients.length];
+    final colors = _tagGradients[gradientIndex % _tagGradients.length];
 
     return GestureDetector(
       onTap: () => _navOrLogin(
         context,
         ref,
-        PlaceholderScreen(
-          title: label,
-          icon: icon,
-          subtitle: subtitle,
-        ),
+        PlaceholderScreen(title: label, icon: icon, subtitle: subtitle),
       ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
@@ -2834,41 +2981,49 @@ class _ProfileTile extends ConsumerWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFF3D6B9E)
-                    .withValues(alpha: 0.10),
+                color: const Color(0xFF3D6B9E).withValues(alpha: 0.10),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF5B92BE)
-                      .withValues(alpha: 0.25),
+                  color: const Color(0xFF5B92BE).withValues(alpha: 0.25),
                 ),
               ),
-              child: Icon(icon,
-                  color: const Color(0xFF2A5480)
-                      .withValues(alpha: 0.8),
-                  size: 20),
+              child: Icon(
+                icon,
+                color: const Color(0xFF2A5480).withValues(alpha: 0.8),
+                size: 20,
+              ),
             ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(label,
-                      style: GoogleFonts.poppins(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: AppColors.textDark)),
+                  Text(
+                    label,
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textDark,
+                    ),
+                  ),
                   if (subtitle != null) ...[
                     const SizedBox(height: 2),
-                    Text(subtitle!,
-                        style: GoogleFonts.poppins(
-                            fontSize: 11,
-                            color: AppColors.textLight)),
+                    Text(
+                      subtitle!,
+                      style: GoogleFonts.poppins(
+                        fontSize: 11,
+                        color: AppColors.textLight,
+                      ),
+                    ),
                   ],
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded,
-                size: 14, color: AppColors.hint),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 14,
+              color: AppColors.hint,
+            ),
           ],
         ),
       ),
