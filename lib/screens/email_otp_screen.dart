@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import 'new_password_screen.dart';
 
 class EmailOtpScreen extends StatelessWidget {
-  const EmailOtpScreen({super.key});
+  final String email;
+  final String? devOtp;
+
+  const EmailOtpScreen({
+    super.key,
+    required this.email,
+    this.devOtp,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,26 +24,20 @@ class EmailOtpScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            CircleAvatar(
+            const CircleAvatar(
               radius: 40,
               backgroundColor: Color(0xFFEAF1FB),
-              child: Icon(
-                Icons.verified_user_outlined,
-                color: Color(0xFF4A7FD4),
-                size: 40,
-              ),
+              child: Icon(Icons.verified_user_outlined,
+                  color: Color(0xFF4A7FD4), size: 40),
             ),
             const SizedBox(height: 20),
             const Text(
-              "Check Your Email",
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
+              'Check Your Email',
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             const Text(
-              "Enter the 6-digit OTP sent to your email",
+              'Enter the 6-digit OTP sent to your email',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
@@ -60,15 +61,12 @@ class EmailOtpScreen extends StatelessWidget {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const NewPasswordScreen(),
-                    ),
-                  );
-                },
-                child: const Text("Verify Code"),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const NewPasswordScreen()),
+                ),
+                child: const Text('Verify Code'),
               ),
             ),
           ],

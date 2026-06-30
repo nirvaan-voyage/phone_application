@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/constants/app_colors.dart';
 
+/// A +/- counter widget used in the travel form for Adults and Kids.
 class CounterWidget extends StatelessWidget {
   const CounterWidget({
     super.key,
     required this.label,
-    required this.subtitle,
-    required this.count,
+    required this.value,
     required this.onIncrement,
     required this.onDecrement,
     this.min = 0,
@@ -15,8 +15,7 @@ class CounterWidget extends StatelessWidget {
   });
 
   final String label;
-  final String subtitle;
-  final int count;
+  final int value;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
   final int min;
@@ -24,109 +23,73 @@ class CounterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: AppColors.inputFill,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.border),
-      ),
-      child: Row(
-        children: [
-          // Label + subtitle
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                Text(
-                  subtitle,
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: AppColors.textLight,
-                  ),
-                ),
-              ],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppColors.textDark,
+          ),
+        ),
+        Row(
+          children: [
+            _CounterButton(
+              icon: Icons.remove,
+              onTap: value > min ? onDecrement : null,
             ),
-          ),
-
-          // Counter controls
-          Row(
-            children: [
-              _CounterButton(
-                icon: Icons.remove,
-                onTap: count > min ? onDecrement : null,
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  '$count',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
-                  ),
+            SizedBox(
+              width: 36,
+              child: Text(
+                '$value',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textDark,
                 ),
               ),
-              _CounterButton(
-                icon: Icons.add,
-                onTap: count < max ? onIncrement : null,
-                filled: true,
-              ),
-            ],
-          ),
-        ],
-      ),
+            ),
+            _CounterButton(
+              icon: Icons.add,
+              onTap: value < max ? onIncrement : null,
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
 
 class _CounterButton extends StatelessWidget {
-  const _CounterButton({
-    required this.icon,
-    required this.onTap,
-    this.filled = false,
-  });
+  const _CounterButton({required this.icon, this.onTap});
 
   final IconData icon;
   final VoidCallback? onTap;
-  final bool filled;
 
   @override
   Widget build(BuildContext context) {
-    final isEnabled = onTap != null;
-
+    final enabled = onTap != null;
     return GestureDetector(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
+      child: Container(
         width: 34,
         height: 34,
         decoration: BoxDecoration(
-          color: filled
-              ? (isEnabled ? AppColors.primary : AppColors.border)
-              : Colors.transparent,
-          border: filled
-              ? null
-              : Border.all(
-                  color: isEnabled ? AppColors.primary : AppColors.border,
-                  width: 1.5,
-                ),
-          shape: BoxShape.circle,
+          color: enabled
+              ? AppColors.primary.withValues(alpha: 0.10)
+              : AppColors.border,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(
+            color: enabled ? AppColors.primary.withValues(alpha: 0.25) : AppColors.border,
+          ),
         ),
         child: Icon(
           icon,
           size: 18,
-          color: filled
-              ? AppColors.white
-              : (isEnabled ? AppColors.primary : AppColors.hint),
+          color: enabled ? AppColors.primary : AppColors.hint,
         ),
       ),
     );

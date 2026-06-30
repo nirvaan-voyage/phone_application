@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/constants/app_colors.dart';
 
+/// The main CTA button used throughout Nirvaan.
+/// Supports loading state, custom colors, and full-width layout.
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
     super.key,
@@ -9,56 +11,62 @@ class PrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.backgroundColor,
     this.foregroundColor,
-    this.borderColor,
-    this.width,
+    this.textColor = AppColors.white,
     this.height = 52,
-    this.borderRadius = 16,
     this.isOutlined = false,
+    this.isLoading = false,
+    this.enabled = true,
   });
 
   final String label;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final Color? backgroundColor;
   final Color? foregroundColor;
-  final Color? borderColor;
-  final double? width;
+  final Color textColor;
   final double height;
-  final double borderRadius;
   final bool isOutlined;
+  final bool isLoading;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
-    final bgColor = isOutlined
-        ? Colors.transparent
-        : (backgroundColor ?? AppColors.primary);
-    final fgColor = foregroundColor ??
-        (isOutlined ? AppColors.primary : AppColors.white);
+    final bgColor = backgroundColor ?? AppColors.primary;
+    final fgColor = foregroundColor ?? textColor;
+    final isEnabled = enabled && !isLoading;
 
     return SizedBox(
-      width: width ?? double.infinity,
+      width: double.infinity,
       height: height,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isEnabled ? onPressed : null,
         style: ElevatedButton.styleFrom(
-          backgroundColor: bgColor,
+          backgroundColor: isOutlined ? Colors.transparent : bgColor,
           foregroundColor: fgColor,
-          elevation: isOutlined ? 0 : 2,
-          shadowColor: AppColors.primary.withOpacity(0.3),
+          disabledBackgroundColor:
+              isOutlined ? Colors.transparent : bgColor.withValues(alpha: 0.55),
+          side: isOutlined ? BorderSide(color: fgColor, width: 1.2) : null,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadius),
-            side: isOutlined
-                ? BorderSide(color: borderColor ?? AppColors.primary, width: 1.5)
-                : BorderSide.none,
+            borderRadius: BorderRadius.circular(14),
           ),
+          elevation: 0,
         ),
-        child: Text(
-          label,
-          style: GoogleFonts.poppins(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: fgColor,
-          ),
-        ),
+        child: isLoading
+            ? SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  color: fgColor,
+                ),
+              )
+            : Text(
+                label,
+                style: GoogleFonts.poppins(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: fgColor,
+                ),
+              ),
       ),
     );
   }

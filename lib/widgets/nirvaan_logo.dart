@@ -1,48 +1,63 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../core/constants/app_colors.dart';
 
+/// Shared Nirvaan brand mark used in splash, login, and auth surfaces.
+/// Uses the real logo assets so every screen stays visually consistent.
 class NirvaanLogo extends StatelessWidget {
   const NirvaanLogo({
     super.key,
-    this.size = 140,
-    this.showTagline = true,
-    this.darkBackground = false,
+    this.size = 120,
+    this.showTagline = false,
+    this.variant = NirvaanLogoVariant.auto,
   });
 
+  /// Controls the rendered logo height. Width is derived from the asset.
   final double size;
+
+  /// Kept for compatibility with older screens that pass this value.
+  /// The official asset already includes the Nirvaan wordmark.
   final bool showTagline;
-  final bool darkBackground;
+
+  final NirvaanLogoVariant variant;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        // ── Real logo image ──────────────────────────────────────
-        Image.asset(
-          'assets/images/nirvaan_logo.png',
-          width: size,
-          height: size,
-          fit: BoxFit.contain,
-        ),
+    final resolvedVariant = variant == NirvaanLogoVariant.auto && size <= 92
+        ? NirvaanLogoVariant.wide
+        : variant == NirvaanLogoVariant.auto
+            ? NirvaanLogoVariant.square
+            : variant;
 
-        SizedBox(height: size * 0.08),
+    final assetPath = switch (resolvedVariant) {
+      NirvaanLogoVariant.compact => 'assets/images/nirvaan_logo_compact.png',
+      NirvaanLogoVariant.wide => 'assets/images/nirvaan_logo_wide.jpeg',
+      NirvaanLogoVariant.square => 'assets/images/nirvaan_logo_square.jpeg',
+      NirvaanLogoVariant.auto => 'assets/images/nirvaan_logo_square.jpeg',
+    };
 
-        if (showTagline) ...[
-          Text(
-            'Go.Far. Stay.Zen.',
-            style: GoogleFonts.poppins(
-              fontSize: size * 0.1,
-              fontWeight: FontWeight.w400,
-              color: darkBackground
-                  ? Colors.white70
-                  : AppColors.textLight,
-              letterSpacing: 0.5,
-            ),
-          ),
-        ],
-      ],
+    final width = switch (resolvedVariant) {
+      NirvaanLogoVariant.compact => size * 2.8,
+      NirvaanLogoVariant.wide => size * 2.8,
+      NirvaanLogoVariant.square => size,
+      NirvaanLogoVariant.auto => size,
+    };
+
+    return Semantics(
+      label: 'Nirvaan',
+      image: true,
+      child: Image.asset(
+        assetPath,
+        height: size,
+        width: width,
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.high,
+      ),
     );
   }
+}
+
+enum NirvaanLogoVariant {
+  auto,
+  square,
+  wide,
+  compact,
 }

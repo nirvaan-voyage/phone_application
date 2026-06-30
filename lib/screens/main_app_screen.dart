@@ -141,7 +141,7 @@ class _BottomNav extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
+            color: Colors.black.withOpacity(0.10),
             blurRadius: 24,
             offset: const Offset(0, -6),
           ),
@@ -496,7 +496,7 @@ class _HeroHeader extends ConsumerWidget {
               height: 160,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Colors.white.withOpacity(0.05),
               ),
             ),
           ),
@@ -508,7 +508,7 @@ class _HeroHeader extends ConsumerWidget {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.07),
+                color: Colors.white.withOpacity(0.07),
               ),
             ),
           ),
@@ -563,10 +563,10 @@ class _HeroHeader extends ConsumerWidget {
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             color: Colors.white
-                                .withValues(alpha: 0.15),
+                                .withOpacity(0.15),
                             border: Border.all(
                               color: Colors.white
-                                  .withValues(alpha: 0.3),
+                                  .withOpacity(0.3),
                               width: 1.5,
                             ),
                           ),
@@ -588,20 +588,20 @@ class _HeroHeader extends ConsumerWidget {
                   Container(
   height: 52,
   decoration: BoxDecoration(
-    color: Colors.white.withValues(alpha: 0.12),
+    color: Colors.white.withOpacity(0.12),
     borderRadius: BorderRadius.circular(16),
     border: Border.all(
-      color: Colors.white.withValues(alpha: 0.25),
+      color: Colors.white.withOpacity(0.25),
       width: 1.2,
     ),
     boxShadow: [
       BoxShadow(
-        color: const Color(0xFF3D3B8E).withValues(alpha: 0.12),
+        color: const Color(0xFF3D3B8E).withOpacity(0.12),
         blurRadius: 16,
         offset: const Offset(0, 4),
       ),
       BoxShadow(
-        color: Colors.white.withValues(alpha: 0.08),
+        color: Colors.white.withOpacity(0.08),
         blurRadius: 6,
         spreadRadius: -2,
         offset: const Offset(-2, -2),
@@ -613,7 +613,7 @@ class _HeroHeader extends ConsumerWidget {
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Icon(Icons.search_rounded,
-            color: Colors.white.withValues(alpha: 0.8),
+            color: Colors.white.withOpacity(0.8),
             size: 22),
       ),
       Expanded(
@@ -621,7 +621,7 @@ class _HeroHeader extends ConsumerWidget {
           'Search destinations, guides...',
           style: GoogleFonts.poppins(
             fontSize: 13,
-            color: Colors.white.withValues(alpha: 0.6),
+            color: Colors.white.withOpacity(0.6),
           ),
         ),
       ),
@@ -630,10 +630,10 @@ class _HeroHeader extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(
             horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.18),
+          color: Colors.white.withOpacity(0.18),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: Colors.white.withValues(alpha: 0.3),
+            color: Colors.white.withOpacity(0.3),
             width: 1,
           ),
         ),
@@ -696,10 +696,10 @@ class _StatBadge extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
+        color: Colors.white.withOpacity(0.12),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-            color: Colors.white.withValues(alpha: 0.2)),
+            color: Colors.white.withOpacity(0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -745,9 +745,9 @@ class _ExploreTabState extends State<_ExploreTab> {
     ('Ranthambore', 'Wildlife', '4.6',
         'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=400'),
     ('Varanasi', 'Spiritual', '4.9',
-        'assets/images/varanasi.jpg'),
+        'assets/images/Varanasi.jpg'),
     ('Andaman', 'Beaches', '4.8',
-        'assets/images/andaman.jpg'),
+        'assets/images/Andaman.jpg'),
     ('Spiti', 'Mountains', '4.9',
         'assets/images/spiti.jpg'),
     ('Mysore', 'Heritage', '4.7',
@@ -791,21 +791,21 @@ class _ExploreTabState extends State<_ExploreTab> {
             child: Container(
   height: 48,
   decoration: BoxDecoration(
-color: const Color(0xFF3D6B9E).withValues(alpha: 0.07),
+color: const Color(0xFF3D6B9E).withOpacity(0.07),
 borderRadius: BorderRadius.circular(14),
 border: Border.all(
-  color: const Color(0xFF5B92BE).withValues(alpha: 0.25),
+  color: const Color(0xFF5B92BE).withOpacity(0.25),
       width: 1.2,
     ),
     boxShadow: [
       BoxShadow(
-        color: const Color(0xFF3D3B8E).withValues(alpha: 0.08),
+        color: const Color(0xFF3D3B8E).withOpacity(0.08),
         blurRadius: 12,
         spreadRadius: 1,
         offset: const Offset(0, 3),
       ),
       BoxShadow(
-        color: Colors.white.withValues(alpha: 0.7),
+        color: Colors.white.withOpacity(0.7),
         blurRadius: 6,
         spreadRadius: -2,
         offset: const Offset(-2, -2),
@@ -817,14 +817,14 @@ border: Border.all(
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 14),
         child: Icon(Icons.search_rounded,
-            color: const Color(0xFF2A5480).withValues(alpha: 0.7),
+            color: const Color(0xFF2A5480).withOpacity(0.7),
             size: 20),
       ),
       Text(
         'Search destinations, guides...', // change text per tab
         style: GoogleFonts.poppins(
             fontSize: 13,
-            color: const Color(0xFF2A5480).withValues(alpha: 0.45)),
+            color: const Color(0xFF2A5480).withOpacity(0.45)),
       ),
     ],
   ),
@@ -866,9 +866,9 @@ border: Border.all(
                       BoxShadow(
                         color: _activeFilter == i
                             ? AppColors.primary
-                                .withValues(alpha: 0.3)
+                                .withOpacity(0.3)
                             : Colors.black
-                                .withValues(alpha: 0.05),
+                                .withOpacity(0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -986,7 +986,7 @@ class _ItineraryTab extends ConsumerWidget {
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.primary
-                          .withValues(alpha: 0.35),
+                          .withOpacity(0.35),
                       blurRadius: 20,
                       offset: const Offset(0, 6),
                     ),
@@ -1003,7 +1003,7 @@ class _ItineraryTab extends ConsumerWidget {
                           Icons.map_rounded,
                           size: 100,
                           color: Colors.white
-                              .withValues(alpha: 0.06),
+                              .withOpacity(0.06),
                         ),
                       ),
                     ),
@@ -1016,7 +1016,7 @@ class _ItineraryTab extends ConsumerWidget {
                             height: 48,
                             decoration: BoxDecoration(
                               color: Colors.white
-                                  .withValues(alpha: 0.15),
+                                  .withOpacity(0.15),
                               borderRadius:
                                   BorderRadius.circular(
                                       14),
@@ -1171,7 +1171,7 @@ class _GuidesTab extends ConsumerWidget {
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black
-                        .withValues(alpha: 0.06),
+                        .withOpacity(0.06),
                     blurRadius: 12,
                     offset: const Offset(0, 2),
                   ),
@@ -1359,7 +1359,7 @@ class _ProfileTab extends ConsumerWidget {
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.primary
-                              .withValues(alpha: 0.35),
+                              .withOpacity(0.35),
                           blurRadius: 16,
                           offset: const Offset(0, 4),
                         ),
@@ -1468,10 +1468,10 @@ class _ProfileTab extends ConsumerWidget {
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white
-                          .withValues(alpha: 0.2),
+                          .withOpacity(0.2),
                       border: Border.all(
                           color: Colors.white
-                              .withValues(alpha: 0.4),
+                              .withOpacity(0.4),
                           width: 2),
                     ),
                     child: const Icon(
@@ -1634,7 +1634,7 @@ class _SectionHeader extends StatelessWidget {
                   horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: AppColors.primary
-                    .withValues(alpha: 0.08),
+                    .withOpacity(0.08),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text('See all',
@@ -1693,21 +1693,21 @@ class _CategoryPill extends ConsumerWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: const Color(0xFF3D6B9E).withValues(alpha: 0.10),
+                color: const Color(0xFF3D6B9E).withOpacity(0.10),
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: const Color(0xFF5B92BE).withValues(alpha: 0.30),
+                  color: const Color(0xFF5B92BE).withOpacity(0.30),
                   width: 1.2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF1D3F63).withValues(alpha: 0.12),
+                    color: const Color(0xFF1D3F63).withOpacity(0.12),
                     blurRadius: 12,
                     spreadRadius: 1,
                     offset: const Offset(0, 4),
                   ),
                   BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: Colors.white.withOpacity(0.6),
                     blurRadius: 6,
                     spreadRadius: -2,
                     offset: const Offset(-2, -2),
@@ -1715,7 +1715,7 @@ class _CategoryPill extends ConsumerWidget {
                 ],
               ),
               child: Icon(icon,
-                  color: const Color(0xFF2A5480).withValues(alpha: 0.85),
+                  color: const Color(0xFF2A5480).withOpacity(0.85),
                   size: 26),
             ),
             const SizedBox(height: 8),
@@ -1761,7 +1761,7 @@ class _PlanJourneyCTA extends ConsumerWidget {
           boxShadow: [
   BoxShadow(
     color: const Color(0xFF1D3F63)
-        .withValues(alpha: 0.35),
+        .withOpacity(0.35),
               blurRadius: 20,
               offset: const Offset(0, 6),
             ),
@@ -1792,7 +1792,7 @@ class _PlanJourneyCTA extends ConsumerWidget {
                   child: Icon(Icons.flight_rounded,
                       size: 120,
                       color: Colors.white
-                          .withValues(alpha: 0.08)),
+                          .withOpacity(0.08)),
                 ),
               ),
               Padding(
@@ -1818,7 +1818,7 @@ class _PlanJourneyCTA extends ConsumerWidget {
                       height: 44,
                       decoration: BoxDecoration(
                         color: Colors.white
-                            .withValues(alpha: 0.2),
+                            .withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -1861,7 +1861,7 @@ class _SmartGuideMatchCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.25),
+              color: AppColors.primary.withOpacity(0.25),
               blurRadius: 18,
               offset: const Offset(0, 6),
             ),
@@ -1873,7 +1873,7 @@ class _SmartGuideMatchCard extends ConsumerWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.16),
+                color: Colors.white.withOpacity(0.16),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(Icons.auto_awesome_rounded,
@@ -1939,7 +1939,7 @@ class _MiniGuideCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -1950,7 +1950,7 @@ class _MiniGuideCard extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 22,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+              backgroundColor: AppColors.primary.withOpacity(0.12),
               child: Text(
                 name.isNotEmpty ? name[0] : '?',
                 style: GoogleFonts.poppins(
@@ -2020,7 +2020,7 @@ class _EventTypeCard extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.10),
+                color: AppColors.primary.withOpacity(0.10),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: AppColors.primary, size: 22),
@@ -2079,9 +2079,9 @@ class _CollabChip extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.08),
+          color: AppColors.primary.withOpacity(0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.16)),
+          border: Border.all(color: AppColors.primary.withOpacity(0.16)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -2126,7 +2126,7 @@ class _FeaturedCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: colors[0].withValues(alpha: 0.2),
+            color: colors[0].withOpacity(0.2),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -2154,7 +2154,7 @@ imageUrl.startsWith('assets/')
                   stops: const [0.3, 1.0],
                   colors: [
                     Colors.transparent,
-                    Colors.black.withValues(alpha: 0.75),
+                    Colors.black.withOpacity(0.75),
                   ],
                 ),
               ),
@@ -2185,7 +2185,7 @@ imageUrl.startsWith('assets/')
                     horizontal: 6, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.black
-                      .withValues(alpha: 0.45),
+                      .withOpacity(0.45),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -2250,7 +2250,7 @@ class _ItineraryCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withOpacity(0.06),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -2285,8 +2285,8 @@ child: IntrinsicHeight(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      colors[0].withValues(alpha: 0.15),
-                      colors[1].withValues(alpha: 0.15),
+                      colors[0].withOpacity(0.15),
+                      colors[1].withOpacity(0.15),
                     ]),
                 borderRadius: BorderRadius.circular(14),
               ),
@@ -2331,9 +2331,9 @@ child: IntrinsicHeight(
                         gradient: LinearGradient(
                             colors: [
                               colors[0]
-                                  .withValues(alpha: 0.15),
+                                  .withOpacity(0.15),
                               colors[1]
-                                  .withValues(alpha: 0.15),
+                                  .withOpacity(0.15),
                             ]),
                         borderRadius:
                             BorderRadius.circular(6),
@@ -2385,7 +2385,7 @@ onTap: () => _navOrLogin(
                       boxShadow: [
                         BoxShadow(
                           color: colors[0]
-                              .withValues(alpha: 0.35),
+                              .withOpacity(0.35),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
@@ -2447,7 +2447,7 @@ imageUrl.startsWith('assets/')
                 stops: const [0.4, 1.0],
                 colors: [
                   Colors.transparent,
-                  Colors.black.withValues(alpha: 0.7),
+                  Colors.black.withOpacity(0.7),
                 ],
               ),
             ),
@@ -2568,7 +2568,7 @@ class _BlogPostCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -2682,7 +2682,7 @@ onTap: () => _navOrLogin(
           boxShadow: [
             BoxShadow(
               color:
-                  Colors.black.withValues(alpha: 0.05),
+                  Colors.black.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 3),
             ),
@@ -2702,7 +2702,7 @@ onTap: () => _navOrLogin(
                 boxShadow: [
                   BoxShadow(
                     color:
-                        colors[0].withValues(alpha: 0.3),
+                        colors[0].withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -2735,10 +2735,10 @@ onTap: () => _navOrLogin(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
                               colors: [
-                                colors[0].withValues(
-                                    alpha: 0.15),
-                                colors[1].withValues(
-                                    alpha: 0.15),
+                                colors[0].withOpacity(
+                                    0.15),
+                                colors[1].withOpacity(
+                                    0.15),
                               ]),
                           borderRadius:
                               BorderRadius.circular(6),
@@ -2770,8 +2770,8 @@ onTap: () => _navOrLogin(
               height: 32,
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
-                  colors[0].withValues(alpha: 0.12),
-                  colors[1].withValues(alpha: 0.12),
+                  colors[0].withOpacity(0.12),
+                  colors[1].withOpacity(0.12),
                 ]),
                 shape: BoxShape.circle,
               ),
@@ -2822,7 +2822,7 @@ class _ProfileTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: Colors.black.withOpacity(0.04),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -2835,16 +2835,16 @@ class _ProfileTile extends ConsumerWidget {
               height: 44,
               decoration: BoxDecoration(
                 color: const Color(0xFF3D6B9E)
-                    .withValues(alpha: 0.10),
+                    .withOpacity(0.10),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: const Color(0xFF5B92BE)
-                      .withValues(alpha: 0.25),
+                      .withOpacity(0.25),
                 ),
               ),
               child: Icon(icon,
                   color: const Color(0xFF2A5480)
-                      .withValues(alpha: 0.8),
+                      .withOpacity(0.8),
                   size: 20),
             ),
             const SizedBox(width: 14),

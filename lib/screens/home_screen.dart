@@ -2,10 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/constants/app_colors.dart';
-import 'login_screen.dart';
 import 'main_app_screen.dart';
 
-// ── Data model for each slide ──────────────────────────────────────────────
+// ── Slide data ─────────────────────────────────────────────────────────────
 class _SlideData {
   const _SlideData({
     required this.imagePath,
@@ -35,7 +34,7 @@ const List<_SlideData> _slides = [
   ),
 ];
 
-// ── Main Screen ────────────────────────────────────────────────────────────
+// ── HomeScreen ─────────────────────────────────────────────────────────────
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -54,19 +53,19 @@ class _HomeScreenState extends State<HomeScreen> {
     _startAutoScroll();
   }
 
-void _startAutoScroll() {
-  _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-    if (_currentPage < _slides.length - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOut,
-      );
-    } else {
-      // Last slide reached — stop the timer
-      _autoScrollTimer?.cancel();
-    }
-  });
-}
+  void _startAutoScroll() {
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (!mounted) return;
+      if (_currentPage < _slides.length - 1) {
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        _autoScrollTimer?.cancel();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -75,7 +74,9 @@ void _startAutoScroll() {
     super.dispose();
   }
 
-  void _goToLogin() {
+  void _enterApp() {
+    // Always navigate to MainAppScreen — users can browse as guests.
+    // The auth sheet is triggered on demand by gated features.
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (_) => const MainAppScreen()),
@@ -87,19 +88,15 @@ void _startAutoScroll() {
     return Scaffold(
       body: Stack(
         children: [
-
-          // ── Full screen PageView ─────────────────────────────────────
+          // Full-screen slide PageView
           PageView.builder(
             controller: _pageController,
             itemCount: _slides.length,
-            onPageChanged: (index) =>
-                setState(() => _currentPage = index),
-            itemBuilder: (_, index) => _SlideWidget(
-              slide: _slides[index],
-            ),
+            onPageChanged: (index) => setState(() => _currentPage = index),
+            itemBuilder: (_, index) => _SlideWidget(slide: _slides[index]),
           ),
 
-          // ── Bottom overlay: dots + button ────────────────────────────
+          // Bottom overlay: text + dots + CTA
           Positioned(
             bottom: 0,
             left: 0,
@@ -110,28 +107,19 @@ void _startAutoScroll() {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
-                    // Slide text (small + big)
                     _SlideText(slide: _slides[_currentPage]),
-
                     const SizedBox(height: 32),
-
-                    // Dot indicators
                     _DotIndicators(
-                      count: _slides.length,
-                      current: _currentPage,
-                    ),
-
+                        count: _slides.length, current: _currentPage),
                     const SizedBox(height: 32),
-
-                    // CTA button — only on last slide
+                    // CTA fades in on the last slide
                     AnimatedOpacity(
                       opacity:
                           _currentPage == _slides.length - 1 ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 300),
                       child: _currentPage == _slides.length - 1
-                          ? _LetsTourButton(onTap: _goToLogin)
-                          : const SizedBox(height: 52),
+                          ? _LetsTourButton(onTap: _enterApp)
+                          : const SizedBox(height: 56),
                     ),
                   ],
                 ),
@@ -144,7 +132,7 @@ void _startAutoScroll() {
   }
 }
 
-// ── Single slide background ────────────────────────────────────────────────
+// ── Slide background ───────────────────────────────────────────────────────
 class _SlideWidget extends StatelessWidget {
   const _SlideWidget({required this.slide});
   final _SlideData slide;
@@ -154,7 +142,6 @@ class _SlideWidget extends StatelessWidget {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Background image
         Image.asset(
           slide.imagePath,
           fit: BoxFit.cover,
@@ -168,8 +155,6 @@ class _SlideWidget extends StatelessWidget {
             ),
           ),
         ),
-
-        // Dark gradient overlay (bottom heavy)
         DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -177,8 +162,8 @@ class _SlideWidget extends StatelessWidget {
               end: Alignment.bottomCenter,
               stops: const [0.0, 0.4, 1.0],
               colors: [
-                Colors.black.withValues(alpha: 0.1),
-                Colors.black.withValues(alpha: 0.2),
+                Colors.black.withValues(alpha: 0.10),
+                Colors.black.withValues(alpha: 0.20),
                 Colors.black.withValues(alpha: 0.85),
               ],
             ),
@@ -189,7 +174,7 @@ class _SlideWidget extends StatelessWidget {
   }
 }
 
-// ── Slide text block ───────────────────────────────────────────────────────
+// ── Slide text ─────────────────────────────────────────────────────────────
 class _SlideText extends StatelessWidget {
   const _SlideText({required this.slide});
   final _SlideData slide;
@@ -206,9 +191,7 @@ class _SlideText extends StatelessWidget {
             color: Colors.white70,
             shadows: [
               Shadow(
-                color: Colors.black.withValues(alpha: 0.5),
-                blurRadius: 8,
-              ),
+                  color: Colors.black.withValues(alpha: 0.5), blurRadius: 8),
             ],
           ),
         ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'login_screen.dart';
+import 'main_app_screen.dart';
 
 class PasswordResetSuccessScreen extends StatelessWidget {
   const PasswordResetSuccessScreen({super.key});
@@ -14,26 +14,21 @@ class PasswordResetSuccessScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 50,
                 backgroundColor: Color(0xFFEAF1FB),
-                child: Icon(
-                  Icons.check_circle,
-                  size: 60,
-                  color: Color(0xFF4A7FD4),
-                ),
+                child: Icon(Icons.check_circle,
+                    size: 60, color: Color(0xFF4A7FD4)),
               ),
               const SizedBox(height: 25),
               const Text(
-                "Password Reset!",
-                style: TextStyle(
-                  fontSize: 30,
-                  fontWeight: FontWeight.bold,
-                ),
+                'Password Reset!',
+                style:
+                    TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               const Text(
-                "Your password has been updated successfully",
+                'Your password has been updated successfully',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 30),
@@ -45,12 +40,11 @@ class PasswordResetSuccessScreen extends StatelessWidget {
                     Navigator.pushAndRemoveUntil(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const LoginScreen(),
-                      ),
+                          builder: (_) => const MainAppScreen()),
                       (route) => false,
                     );
                   },
-                  child: const Text("Back To Login"),
+                  child: const Text('Back to App'),
                 ),
               ),
             ],

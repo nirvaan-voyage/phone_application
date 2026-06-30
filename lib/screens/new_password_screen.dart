@@ -17,41 +17,33 @@ class NewPasswordScreen extends StatelessWidget {
         child: Column(
           children: [
             const SizedBox(height: 20),
-            CircleAvatar(
+            const CircleAvatar(
               radius: 40,
               backgroundColor: Color(0xFFEAF1FB),
-              child: Icon(
-                Icons.lock_outline,
-                color: Color(0xFF4A7FD4),
-                size: 40,
-              ),
+              child: Icon(Icons.lock_outline,
+                  color: Color(0xFF4A7FD4), size: 40),
             ),
             const SizedBox(height: 20),
             const Text(
-              "Create New Password",
-              style: TextStyle(
-                fontSize: 26,
-                fontWeight: FontWeight.bold,
-              ),
+              'Create New Password',
+              style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 25),
             TextField(
               obscureText: true,
               decoration: InputDecoration(
-                hintText: "New Password",
+                hintText: 'New Password',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const SizedBox(height: 15),
             TextField(
               obscureText: true,
               decoration: InputDecoration(
-                hintText: "Confirm Password",
+                hintText: 'Confirm Password',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const SizedBox(height: 25),
@@ -59,15 +51,12 @@ class NewPasswordScreen extends StatelessWidget {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const PasswordResetSuccessScreen(),
-                    ),
-                  );
-                },
-                child: const Text("Reset Password"),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const PasswordResetSuccessScreen()),
+                ),
+                child: const Text('Reset Password'),
               ),
             ),
           ],

@@ -1,3 +1,10 @@
+// ──────────────────────────────────────────────────────────────────────────
+// NOTE FOR TANYA / MERGE:
+// These forgot-password screens are Meghna's UI work. They are intentionally
+// UI-only for now — backend OTP/reset endpoints will be wired by Vaanya.
+// Do NOT delete these files. They are reachable from auth_bottom_sheet.dart.
+// ──────────────────────────────────────────────────────────────────────────
+
 import 'package:flutter/material.dart';
 import 'forgot_password_email_screen.dart';
 import 'forgot_password_mobile_screen.dart';
@@ -34,57 +41,44 @@ class ForgotPasswordMethodScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             const Text(
-              "Reset your password",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
+              'Reset your password',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             const Text(
-              "How would you like to receive your reset code?",
+              'How would you like to receive your reset code?',
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 30),
             _methodCard(
               icon: Icons.email_outlined,
-              title: "Email address",
-              subtitle: "Code sent to your email",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ForgotPasswordEmailScreen(),
-                  ),
-                );
-                // Email Screen
-              },
+              title: 'Email address',
+              subtitle: 'Code sent to your email',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const ForgotPasswordEmailScreen()),
+              ),
             ),
             const SizedBox(height: 15),
-            const Text("OR"),
+            const Text('OR'),
             const SizedBox(height: 15),
             _methodCard(
               icon: Icons.phone_android,
-              title: "Mobile number",
-              subtitle: "OTP sent via SMS",
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const ForgotPasswordMobileScreen(),
-                  ),
-                );
-                // Mobile Screen
-              },
+              title: 'Mobile number',
+              subtitle: 'OTP sent via SMS',
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => const ForgotPasswordMobileScreen()),
+              ),
             ),
             const Spacer(),
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Back to Login"),
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Back to Login'),
               ),
             ),
           ],
@@ -101,6 +95,7 @@ class ForgotPasswordMethodScreen extends StatelessWidget {
   }) {
     return InkWell(
       onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
@@ -115,18 +110,11 @@ class ForgotPasswordMethodScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: const TextStyle(
-                      color: Colors.grey,
-                    ),
-                  ),
+                  Text(title,
+                      style:
+                          const TextStyle(fontWeight: FontWeight.w600)),
+                  Text(subtitle,
+                      style: const TextStyle(color: Colors.grey)),
                 ],
               ),
             ),

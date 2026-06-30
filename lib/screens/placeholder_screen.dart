@@ -26,10 +26,10 @@ class PlaceholderScreen extends StatelessWidget {
           child: Container(
             margin: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: const Color(0xFF3D6B9E).withValues(alpha: 0.10),
+              color: const Color(0xFF3D6B9E).withOpacity(0.10),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFF5B92BE).withValues(alpha: 0.25),
+                color: const Color(0xFF5B92BE).withOpacity(0.25),
               ),
             ),
             child: const Icon(Icons.arrow_back_ios_new_rounded,
@@ -54,16 +54,16 @@ class PlaceholderScreen extends StatelessWidget {
               width: 90,
               height: 90,
               decoration: BoxDecoration(
-                color: const Color(0xFF3D6B9E).withValues(alpha: 0.10),
+                color: const Color(0xFF3D6B9E).withOpacity(0.10),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xFF5B92BE).withValues(alpha: 0.25),
+                  color: const Color(0xFF5B92BE).withOpacity(0.25),
                   width: 1.5,
                 ),
               ),
               child: Icon(icon,
                   size: 42,
-                  color: const Color(0xFF2A5480).withValues(alpha: 0.7)),
+                  color: const Color(0xFF2A5480).withOpacity(0.7)),
             ),
             const SizedBox(height: 20),
             Text(

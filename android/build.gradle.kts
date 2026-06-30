@@ -1,5 +1,3 @@
-plugins {
-}
 allprojects {
     repositories {
         google()

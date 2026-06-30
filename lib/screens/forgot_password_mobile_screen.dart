@@ -19,40 +19,30 @@ class ForgotPasswordMobileScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 30),
-            CircleAvatar(
+            const CircleAvatar(
               radius: 40,
-              backgroundColor: const Color(0xFFEAF1FB),
-              child: Icon(
-                Icons.phone_android,
-                color: const Color(0xFF4A7FD4),
-                size: 40,
-              ),
+              backgroundColor: Color(0xFFEAF1FB),
+              child: Icon(Icons.phone_android,
+                  color: Color(0xFF4A7FD4), size: 40),
             ),
             const SizedBox(height: 30),
             const Text(
-              "Reset via Mobile",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
+              'Reset via Mobile',
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             const Text(
-              "Enter your registered mobile number",
+              'Enter your registered mobile number',
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 40),
             TextField(
               keyboardType: TextInputType.phone,
               decoration: InputDecoration(
-                hintText: "Mobile Number",
+                hintText: 'Mobile Number',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
+                    borderRadius: BorderRadius.circular(12)),
               ),
             ),
             const SizedBox(height: 25),
@@ -60,15 +50,12 @@ class ForgotPasswordMobileScreen extends StatelessWidget {
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const MobileOtpScreen(),
-                    ),
-                  );
-                },
-                child: const Text("Send OTP"),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (_) => const MobileOtpScreen()),
+                ),
+                child: const Text('Send OTP'),
               ),
             ),
           ],

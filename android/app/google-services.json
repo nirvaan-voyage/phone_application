@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "1087824252092",
+    "project_id": "nirvaan-74ff2",
+    "storage_bucket": "nirvaan-74ff2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1087824252092:android:a72811dfc7adf2e6f794b9",
+        "android_client_info": {
+          "package_name": "com.example.nirvaan"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1087824252092-2jhgutlcms4gvipvo2t4ageefiqff0s8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nirvaan",
+            "certificate_hash": "64db952401facea6aab95619b09005e6d6904134"
+          }
+        },
+        {
+          "client_id": "1087824252092-s52dea3er67geafh7bbhtcb64r9kl3ni.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_MOLaYU80kP58GZNoc274QXLDPZVRTk8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1087824252092-s52dea3er67geafh7bbhtcb64r9kl3ni.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1087824252092-oo6s5tme06r5n0ek6qftr8a3i4cmhj8r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.nirvaan"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
