@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../core/constants/app_colors.dart';
 import '../core/constants/app_strings.dart';
@@ -7,21 +8,23 @@ import '../widgets/primary_button.dart';
 import 'travel_details_screen.dart';
 import '../screens/forgot_password_method_screen.dart';
 import '../core/services/google_auth_service.dart';
+import '../providers/auth_provider.dart';
 import 'main_app_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _loginController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _passwordVisible = false;
   String? _loginError;
   String? _passwordError;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -55,10 +58,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Only navigate if both are valid
     if (_loginError == null && _passwordError == null) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (_) => const TravelDetailsScreen()),
-      );
+      setState(() => _isLoading = true);
+
+      // Simulate network delay for demo
+      await Future.delayed(const Duration(seconds: 1));
+
+      if (mounted) {
+        setState(() => _isLoading = false);
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const TravelDetailsScreen()),
+        );
+      }
     }
   }
 
@@ -140,7 +151,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-
               TextField(
                 controller: _passwordController,
                 obscureText: !_passwordVisible,
@@ -201,61 +211,88 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 14),
               PrimaryButton(
                 label: AppStrings.continueBtn,
-                onPressed: () async {
-                  await _onContinue();
-                },
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        await _onContinue();
+                      },
                 backgroundColor: AppColors.textDark,
                 height: 48,
               ),
-               const SizedBox(height: 12),
+              const SizedBox(height: 12),
               OutlinedButton.icon(
-  onPressed: () async {
-    try {
-      final user =
-          await GoogleAuthService.signInWithGoogle();
+                onPressed: () async {
+                  try {
+                    final user = await GoogleAuthService.signInWithGoogle();
 
-      if (user != null && context.mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => const TravelDetailsScreen(),
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              'Google Sign-In failed: $e',
-            ),
-          ),
-        );
-      }
-    }
-  },
+                    if (user != null && context.mounted) {
+                      // Connect with Neon backend
+                      final firebaseUser = user.user;
+                      if (firebaseUser != null) {
+                        final notifier = ref.read(authProvider.notifier);
 
-  icon: Image.asset(
-    'assets/images/google_logo.png',
-    height: 20,
-  ),
+                        // Show loading
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) => const Center(
+                            child: CircularProgressIndicator(
+                                color: AppColors.primary),
+                          ),
+                        );
 
-  label: const Text(
-    'Continue with Google',
-  ),
+                        // Connect with backend
+                        final error = await notifier.loginWithGoogle(
+                          email: firebaseUser.email ?? '',
+                          name: firebaseUser.displayName,
+                        );
 
-  style: OutlinedButton.styleFrom(
-    minimumSize: const Size(double.infinity, 50),
-  ),
-),
+                        if (context.mounted) {
+                          Navigator.pop(context); // Close loading
 
-const SizedBox(height: 12),
-               TextButton(
+                          if (error != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(error)),
+                            );
+                          } else {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const MainAppScreen(),
+                              ),
+                            );
+                          }
+                        }
+                      }
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Google Sign-In failed: $e'),
+                        ),
+                      );
+                    }
+                  }
+                },
+                icon: Image.asset(
+                  'assets/images/google_logo.png',
+                  height: 20,
+                ),
+                label: const Text(
+                  'Continue with Google',
+                ),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
                 onPressed: () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ForgotPasswordMethodScreen(),
+                      builder: (_) => const ForgotPasswordMethodScreen(),
                     ),
                   );
                 },
@@ -300,27 +337,59 @@ const SizedBox(height: 12),
                   ),
                 ),
                 onTap: () async {
-  try {
-    final user = await GoogleAuthService.signInWithGoogle();
+                  try {
+                    final user = await GoogleAuthService.signInWithGoogle();
 
-    if (user != null && mounted) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const TravelDetailsScreen(),
-        ),
-      );
-    }
-  } catch (e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Google Sign-In failed: $e'),
-        ),
-      );
-    }
-  }
-},
+                    if (user != null && mounted) {
+                      // Connect with Neon backend
+                      final firebaseUser = user.user;
+                      if (firebaseUser != null) {
+                        final notifier = ref.read(authProvider.notifier);
+
+                        // Show loading
+                        showDialog(
+                          context: context,
+                          barrierDismissible: false,
+                          builder: (_) => const Center(
+                            child: CircularProgressIndicator(
+                                color: AppColors.primary),
+                          ),
+                        );
+
+                        // Connect with backend
+                        final error = await notifier.loginWithGoogle(
+                          email: firebaseUser.email ?? '',
+                          name: firebaseUser.displayName,
+                        );
+
+                        if (mounted) {
+                          Navigator.pop(context); // Close loading
+
+                          if (error != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(error)),
+                            );
+                          } else {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const MainAppScreen(),
+                              ),
+                            );
+                          }
+                        }
+                      }
+                    }
+                  } catch (e) {
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Google Sign-In failed: $e'),
+                        ),
+                      );
+                    }
+                  }
+                },
               ),
               const SizedBox(height: 10),
               const Spacer(),

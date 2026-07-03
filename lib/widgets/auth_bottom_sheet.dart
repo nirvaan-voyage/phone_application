@@ -8,7 +8,6 @@ import '../core/constants/app_strings.dart';
 import '../core/services/google_auth_service.dart';
 import '../providers/auth_provider.dart';
 import '../screens/forgot_password_method_screen.dart';
-import '../screens/travel_details_screen.dart';
 import '../widgets/nirvaan_logo.dart';
 
 /// Shows the auth bottom sheet.
@@ -364,9 +363,8 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                 // ── Email / Username field ────────────────────────────────
                 _SheetField(
                   controller: _emailController,
-                  hint: _isCreateAccount
-                      ? 'Email address'
-                      : 'Email or username',
+                  hint:
+                      _isCreateAccount ? 'Email address' : 'Email or username',
                   errorText: _emailError,
                   keyboardType: TextInputType.emailAddress,
                   textInputAction: TextInputAction.next,
@@ -548,6 +546,7 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                     ),
                   ),
                   onTap: () async {
+                    final navigator = Navigator.of(context);
                     try {
                       final user = await GoogleAuthService.signInWithGoogle();
 
@@ -556,27 +555,34 @@ class _AuthSheetState extends ConsumerState<_AuthSheet> {
                         final firebaseUser = user.user;
                         if (firebaseUser != null) {
                           final notifier = ref.read(authProvider.notifier);
-                          await notifier.persistAndApplySession(
-                            token: await firebaseUser.getIdToken() ?? '',
+
+                          // Connect with Neon backend
+                          final error = await notifier.loginWithGoogle(
                             email: firebaseUser.email ?? '',
                             name: firebaseUser.displayName,
-                            username: firebaseUser.email?.split('@').first,
-                            phone: firebaseUser.phoneNumber,
                           );
+
+                          if (error != null) {
+                            setState(() => _serverError = error);
+                            return;
+                          }
                         }
-                        Navigator.of(context).pop(true);
+                        navigator.pop(true);
                       }
                     } catch (e) {
                       if (mounted) {
                         String errorMsg = 'Google Sign-In failed';
                         if (e.toString().contains('network')) {
-                          errorMsg = 'Network error. Please check your internet connection.';
+                          errorMsg =
+                              'Network error. Please check your internet connection.';
                         } else if (e.toString().contains('Firebase')) {
-                          errorMsg = 'Firebase authentication failed. Check Firebase Console configuration.';
+                          errorMsg =
+                              'Firebase authentication failed. Check Firebase Console configuration.';
                         } else if (e.toString().contains('account')) {
                           errorMsg = 'No Google account found on device.';
                         }
-                        setState(() => _serverError = '$errorMsg\n\nCheck debug console for details.');
+                        setState(() => _serverError =
+                            '$errorMsg\n\nCheck debug console for details.');
                       }
                     }
                   },

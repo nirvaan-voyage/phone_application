@@ -2,6 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class GoogleAuthService {
+  static String? lastIdToken;
+
   static Future<UserCredential?> signInWithGoogle() async {
     try {
       print('=== Google Sign-In Started ===');
@@ -31,6 +33,7 @@ class GoogleAuthService {
       print('Step 4: Getting authentication tokens...');
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+          lastIdToken = googleAuth.idToken;
       
       print('✅ Tokens received');
       print('   Access Token: ${googleAuth.accessToken != null ? "Present (${googleAuth.accessToken!.length} chars)" : "NULL"}');

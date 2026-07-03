@@ -1,0 +1,492 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import '../core/constants/app_colors.dart';
+import '../providers/auth_provider.dart';
+import '../widgets/primary_button.dart';
+import 'main_app_screen.dart';
+
+class CompleteProfileScreen extends ConsumerStatefulWidget {
+  const CompleteProfileScreen({super.key});
+
+  @override
+  ConsumerState<CompleteProfileScreen> createState() =>
+      _CompleteProfileScreenState();
+}
+
+class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
+  final _usernameController = TextEditingController();
+  final _phoneController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _photoUrlController = TextEditingController();
+
+  String? _usernameError;
+  String? _phoneError;
+  String? _ageError;
+  String? _serverError;
+
+  @override
+  void initState() {
+    super.initState();
+    final auth = ref.read(authProvider);
+    _usernameController.text = auth.username ?? '';
+    _phoneController.text = auth.phone ?? '';
+    _ageController.text = auth.age?.toString() ?? '';
+    _photoUrlController.text = auth.profilePhotoPath ?? '';
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _phoneController.dispose();
+    _ageController.dispose();
+    _photoUrlController.dispose();
+    super.dispose();
+  }
+
+  bool _validateFields() {
+    bool valid = true;
+
+    // Username validation
+    final username = _usernameController.text.trim();
+    if (username.isEmpty) {
+      _usernameError = 'Please choose a username';
+      valid = false;
+    } else if (username.length < 3) {
+      _usernameError = 'Username must be at least 3 characters';
+      valid = false;
+    } else if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(username)) {
+      _usernameError = 'Only letters, numbers, and underscores';
+      valid = false;
+    } else {
+      _usernameError = null;
+    }
+
+    // Phone validation
+    final phone = _phoneController.text.trim();
+    if (phone.isEmpty) {
+      _phoneError = 'Please enter your phone number';
+      valid = false;
+    } else if (phone.length < 10) {
+      _phoneError = 'Enter a valid 10-digit number';
+      valid = false;
+    } else {
+      _phoneError = null;
+    }
+
+    // Age validation
+    final ageText = _ageController.text.trim();
+    if (ageText.isEmpty) {
+      _ageError = 'Please enter your age';
+      valid = false;
+    } else {
+      final age = int.tryParse(ageText);
+      if (age == null || age < 13 || age > 120) {
+        _ageError = 'Please enter a valid age (13+)';
+        valid = false;
+      } else {
+        _ageError = null;
+      }
+    }
+
+    return valid;
+  }
+
+  Future<void> _onContinue() async {
+    FocusScope.of(context).unfocus();
+    setState(() {
+      _usernameError = null;
+      _phoneError = null;
+      _ageError = null;
+      _serverError = null;
+    });
+
+    if (!_validateFields()) {
+      setState(() {});
+      return;
+    }
+
+    final notifier = ref.read(authProvider.notifier);
+    final error = await notifier.completeProfile(
+      username: _usernameController.text.trim(),
+      phone: _phoneController.text.trim(),
+      age: int.parse(_ageController.text.trim()),
+      profilePhotoPath: _photoUrlController.text.trim().isEmpty
+          ? null
+          : _photoUrlController.text.trim(),
+    );
+
+    if (!mounted) return;
+
+    if (error != null) {
+      setState(() => _serverError = error);
+    } else {
+      // Profile completed successfully, go to main app
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MainAppScreen()),
+        (route) => false,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final auth = ref.watch(authProvider);
+    final photoUrl = _photoUrlController.text.trim();
+
+    return Scaffold(
+      backgroundColor: AppColors.white,
+      resizeToAvoidBottomInset: false,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 18),
+
+              // Header
+              Text(
+                'Complete Your Profile',
+                style: GoogleFonts.poppins(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Just a few more details to get started',
+                style: GoogleFonts.poppins(
+                  fontSize: 13,
+                  color: AppColors.textLight,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+
+              Column(
+                children: [
+                  CircleAvatar(
+                    radius: 42,
+                    backgroundColor: AppColors.inputFill,
+                    backgroundImage: photoUrl.startsWith('http')
+                        ? NetworkImage(photoUrl)
+                        : null,
+                    child: !photoUrl.startsWith('http')
+                        ? const Icon(
+                            Icons.add_a_photo_rounded,
+                            color: AppColors.primary,
+                            size: 30,
+                          )
+                        : null,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Profile photo is optional',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 18),
+
+              TextField(
+                controller: _photoUrlController,
+                onChanged: (_) => setState(() {}),
+                keyboardType: TextInputType.url,
+                textInputAction: TextInputAction.next,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: AppColors.textDark,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Profile photo URL (optional)',
+                  hintStyle: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: AppColors.hint,
+                  ),
+                  filled: true,
+                  fillColor: AppColors.inputFill,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  prefixIcon: const Icon(
+                    Icons.image_rounded,
+                    color: AppColors.hint,
+                    size: 20,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
+              // Server error banner
+              if (_serverError != null) ...[
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.error_outline_rounded,
+                          color: Colors.red.shade400, size: 18),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _serverError!,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Colors.red.shade700,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+              ],
+
+              // Pre-filled info (read-only)
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.inputFill,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.person_rounded,
+                        color: AppColors.primary, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            auth.name ?? 'User',
+                            style: GoogleFonts.poppins(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textDark,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            auth.userEmail ?? '',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: AppColors.textLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Icon(Icons.verified_rounded,
+                        color: AppColors.primary, size: 18),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Username field
+              TextField(
+                controller: _usernameController,
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: AppColors.textDark,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Choose a username',
+                  hintStyle: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: AppColors.hint,
+                  ),
+                  errorText: _usernameError,
+                  filled: true,
+                  fillColor: AppColors.inputFill,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  prefixIcon: Icon(Icons.alternate_email_rounded,
+                      color: AppColors.hint, size: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Phone field
+              TextField(
+                controller: _phoneController,
+                keyboardType: TextInputType.phone,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(10),
+                ],
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: AppColors.textDark,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Phone number (10 digits)',
+                  hintStyle: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: AppColors.hint,
+                  ),
+                  errorText: _phoneError,
+                  filled: true,
+                  fillColor: AppColors.inputFill,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  prefixIcon: Icon(Icons.phone_rounded,
+                      color: AppColors.hint, size: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Age field
+              TextField(
+                controller: _ageController,
+                keyboardType: TextInputType.number,
+                inputFormatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(3),
+                ],
+                style: GoogleFonts.poppins(
+                  fontSize: 14,
+                  color: AppColors.textDark,
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Your age',
+                  hintStyle: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: AppColors.hint,
+                  ),
+                  errorText: _ageError,
+                  filled: true,
+                  fillColor: AppColors.inputFill,
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 12,
+                  ),
+                  prefixIcon:
+                      Icon(Icons.cake_rounded, color: AppColors.hint, size: 20),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.border),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 1.5,
+                    ),
+                  ),
+                  errorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
+                  focusedErrorBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: Colors.red, width: 1.5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Continue button
+              PrimaryButton(
+                label: 'Continue',
+                onPressed: _onContinue,
+                backgroundColor: AppColors.textDark,
+                height: 48,
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

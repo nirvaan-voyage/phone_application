@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
+import '../core/services/google_auth_service.dart';
 
 // ── Storage key constants ──────────────────────────────────────────────────
 class _StorageKeys {
@@ -14,19 +15,20 @@ class _StorageKeys {
   static const phone = 'nirvaan_phone';
   static const age = 'nirvaan_age';
   static const loginId = 'nirvaan_login_id';
+  static const profilePhotoPath = 'nirvaan_profile_photo_path';
 }
 
 // ── Backend base URL ───────────────────────────────────────────────────────
 // Configure based on your testing environment:
 //   - Android emulator:  http://10.0.2.2:8080
 //   - iOS simulator:     http://localhost:8080
-//   - Physical device via USB debugging: http://localhost:8080
+//   - Physical device via USB debugging: http://127.0.0.1:8080
 //   - Physical device via WiFi: http://[YOUR_WIFI_IP]:8080
 //   - Web/Desktop:       http://localhost:8080
 //
-// Current setup: Phone and PC on same WiFi network
-// Using Windows machine IP address
-const String _kBaseUrl = 'http://192.168.10.7:8080';
+// Current setup: physical Android phone connected by USB.
+// Run: adb reverse tcp:8080 tcp:8080
+const String _kBaseUrl = 'http://127.0.0.1:8080';
 
 // ── AuthState ──────────────────────────────────────────────────────────────
 /// Represents the full authentication state of the app.
@@ -42,6 +44,7 @@ class AuthState {
     this.username,
     this.age,
     this.phone,
+    this.profilePhotoPath,
     this.loginId,
     this.isLoading = false,
     this.error,
@@ -56,6 +59,7 @@ class AuthState {
   final String? username;
   final int? age;
   final String? phone;
+  final String? profilePhotoPath;
   final String? loginId;
   final bool isLoading;
   final String? error;
@@ -70,6 +74,7 @@ class AuthState {
     String? username,
     int? age,
     String? phone,
+    String? profilePhotoPath,
     String? loginId,
     bool? isLoading,
     String? error,
@@ -87,6 +92,7 @@ class AuthState {
       username: username ?? this.username,
       age: age ?? this.age,
       phone: phone ?? this.phone,
+      profilePhotoPath: profilePhotoPath ?? this.profilePhotoPath,
       loginId: loginId ?? this.loginId,
       isLoading: isLoading ?? this.isLoading,
       error: clearError ? null : (error ?? this.error),
@@ -129,6 +135,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final name = await _storage.read(key: _StorageKeys.name);
       final username = await _storage.read(key: _StorageKeys.username);
       final phone = await _storage.read(key: _StorageKeys.phone);
+      final profilePhotoPath =
+          await _storage.read(key: _StorageKeys.profilePhotoPath);
       final loginId = await _storage.read(key: _StorageKeys.loginId);
       final ageStr = await _storage.read(key: _StorageKeys.age);
 
@@ -140,6 +148,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         name: name,
         username: username,
         phone: phone,
+        profilePhotoPath: profilePhotoPath,
         loginId: loginId,
         age: ageStr != null ? int.tryParse(ageStr) : null,
         rememberMe: true,
@@ -301,6 +310,151 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState(isLoggedIn: false, isGuest: true);
   }
 
+  // ── Google Sign-In ──────────────────────────────────────────────────────
+  /// POST /auth/google
+  /// Used for Google Sign-In flow. Backend checks if email exists,
+  /// returns JWT if exists, or creates new user if not.
+  /// Returns null on success, or an error message string on failure.
+  Future<String?> loginWithGoogle({
+    required String email,
+    String? name,
+  }) async {
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      final response = await http
+          .post(
+            Uri.parse('$_kBaseUrl/auth/google'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'idToken': GoogleAuthService.lastIdToken,
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        final token = body['token'] as String? ?? '';
+        final user = body['user'] as Map<String, dynamic>? ?? {};
+
+        final userEmail = user['email'] as String? ?? email;
+        final userName = user['name'] as String?;
+        final username = user['username'] as String?;
+        final phone = user['phone'] as String?;
+        final loginId = user['id']?.toString();
+        final age = user['age'] is int
+            ? user['age'] as int
+            : int.tryParse(user['age']?.toString() ?? '');
+
+        await persistAndApplySession(
+          token: token,
+          email: userEmail,
+          name: userName,
+          username: username,
+          phone: phone,
+          age: age,
+          loginId: loginId,
+        );
+
+        return null; // success
+      } else {
+        final msg = _extractErrorMessage(body);
+        state = state.copyWith(isLoading: false, error: msg);
+        return msg;
+      }
+    } catch (e) {
+      final msg = 'Could not connect to server at $_kBaseUrl. '
+          'Ensure backend is running and accessible.';
+      state = state.copyWith(isLoading: false, error: msg);
+      return msg;
+    }
+  }
+
+  // ── Complete Profile ────────────────────────────────────────────────────
+  /// PUT /auth/profile
+  /// Updates user profile after Google Sign-In
+  /// Returns null on success, or an error message string on failure.
+  Future<String?> completeProfile({
+    required String username,
+    required String phone,
+    required int age,
+    String? profilePhotoPath,
+  }) async {
+    if (!state.isLoggedIn || state.token == null) {
+      return 'User not authenticated';
+    }
+
+    state = state.copyWith(isLoading: true, clearError: true);
+
+    try {
+      final response = await http
+          .put(
+            Uri.parse('$_kBaseUrl/auth/profile'),
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer ${state.token}',
+            },
+            body: jsonEncode({
+              'username': username,
+              'phone': phone,
+              'age': age,
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
+
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200) {
+        final token = body['token'] as String? ?? state.token ?? '';
+        final user = body['user'] as Map<String, dynamic>? ?? {};
+        final userEmail = user['email'] as String? ?? state.userEmail ?? '';
+        final name = user['name'] as String? ?? state.name;
+        final loginId = user['id']?.toString() ?? state.loginId;
+
+        await persistAndApplySession(
+          token: token,
+          email: userEmail,
+          name: name,
+          username: username,
+          phone: phone,
+          age: age,
+          profilePhotoPath: profilePhotoPath ?? state.profilePhotoPath,
+          loginId: loginId,
+        );
+
+        state = state.copyWith(
+          username: username,
+          phone: phone,
+          age: age,
+          profilePhotoPath: profilePhotoPath ?? state.profilePhotoPath,
+          isLoading: false,
+        );
+
+        return null; // success
+      } else {
+        final msg = _extractErrorMessage(body);
+        state = state.copyWith(isLoading: false, error: msg);
+        return msg;
+      }
+    } catch (e) {
+      final msg = 'Could not connect to server at $_kBaseUrl. '
+          'Ensure backend is running and accessible.';
+      state = state.copyWith(isLoading: false, error: msg);
+      return msg;
+    }
+  }
+
+  /// Check if user needs to complete profile (for Google Sign-In users)
+  bool get needsProfileCompletion {
+    return state.isLoggedIn &&
+        (state.username == null ||
+            state.username!.isEmpty ||
+            state.phone == null ||
+            state.phone!.length != 10 ||
+            state.age == null);
+  }
+
   // ── OTP & Password Reset ────────────────────────────────────────────────
   /// POST /auth/generate-otp
   /// purpose: 'signup' | 'forgot_password'
@@ -308,11 +462,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<String?> generateOtp(String email, String purpose) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final response = await http.post(
-        Uri.parse('$_kBaseUrl/auth/generate-otp'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'purpose': purpose}),
-      ).timeout(const Duration(seconds: 15));
+      final response = await http
+          .post(
+            Uri.parse('$_kBaseUrl/auth/generate-otp'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({'email': email, 'purpose': purpose}),
+          )
+          .timeout(const Duration(seconds: 15));
 
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       state = state.copyWith(isLoading: false);
@@ -335,11 +491,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> verifyOtp(String email, String purpose, String code) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final response = await http.post(
-        Uri.parse('$_kBaseUrl/auth/verify-otp'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'purpose': purpose, 'code': code}),
-      ).timeout(const Duration(seconds: 15));
+      final response = await http
+          .post(
+            Uri.parse('$_kBaseUrl/auth/verify-otp'),
+            headers: {'Content-Type': 'application/json'},
+            body:
+                jsonEncode({'email': email, 'purpose': purpose, 'code': code}),
+          )
+          .timeout(const Duration(seconds: 15));
 
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       state = state.copyWith(isLoading: false);
@@ -359,15 +518,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
   Future<void> resetPassword(String email, String code, String password) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
-      final response = await http.post(
-        Uri.parse('$_kBaseUrl/auth/reset-password'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': email,
-          'code': code,
-          'password': password,
-        }),
-      ).timeout(const Duration(seconds: 15));
+      final response = await http
+          .post(
+            Uri.parse('$_kBaseUrl/auth/reset-password'),
+            headers: {'Content-Type': 'application/json'},
+            body: jsonEncode({
+              'email': email,
+              'code': code,
+              'password': password,
+            }),
+          )
+          .timeout(const Duration(seconds: 15));
 
       final body = jsonDecode(response.body) as Map<String, dynamic>;
       state = state.copyWith(isLoading: false);
@@ -396,6 +557,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     String? phone,
     int? age,
     String? loginId,
+    String? profilePhotoPath,
   }) async {
     await _storage.write(key: _StorageKeys.token, value: token);
     await _storage.write(key: _StorageKeys.email, value: email);
@@ -412,6 +574,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     if (loginId != null) {
       await _storage.write(key: _StorageKeys.loginId, value: loginId);
     }
+    if (profilePhotoPath != null && profilePhotoPath.trim().isNotEmpty) {
+      await _storage.write(
+        key: _StorageKeys.profilePhotoPath,
+        value: profilePhotoPath,
+      );
+    }
 
     state = AuthState(
       isLoggedIn: true,
@@ -421,6 +589,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       name: name,
       username: username,
       phone: phone,
+      profilePhotoPath: profilePhotoPath ?? state.profilePhotoPath,
       age: age,
       loginId: loginId,
       rememberMe: true,
@@ -436,6 +605,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await _storage.delete(key: _StorageKeys.phone);
     await _storage.delete(key: _StorageKeys.age);
     await _storage.delete(key: _StorageKeys.loginId);
+    await _storage.delete(key: _StorageKeys.profilePhotoPath);
   }
 
   String _extractErrorMessage(Map<String, dynamic> body) {

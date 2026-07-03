@@ -60,10 +60,10 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     if (!mounted) return;
 
     final auth = ref.read(authProvider);
-
-    // First launch (no prior session and no stored token) → show onboarding
-    // Returning guest / logged-in user → go straight into the app
-    final destination = auth.isLoggedIn ? const MainAppScreen() : _resolveFirstDestination();
+    // First launch (no prior session and no stored token) â†’ show onboarding
+    // Returning guest / logged-in user â†’ go straight into the app
+    final destination =
+        auth.isLoggedIn ? const MainAppScreen() : _resolveFirstDestination();
 
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(

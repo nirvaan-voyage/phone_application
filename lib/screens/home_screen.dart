@@ -91,6 +91,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Full-screen slide PageView
           PageView.builder(
             controller: _pageController,
+            physics: const AlwaysScrollableScrollPhysics(),
             itemCount: _slides.length,
             onPageChanged: (index) => setState(() => _currentPage = index),
             itemBuilder: (_, index) => _SlideWidget(slide: _slides[index]),
