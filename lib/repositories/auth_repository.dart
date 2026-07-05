@@ -47,7 +47,7 @@ class AuthRepository {
     return await _api.post(
       "/auth/generate-otp",
       {
-        "email": email,
+        "identifier": email,
         "purpose": purpose,
       },
     );
@@ -62,7 +62,7 @@ class AuthRepository {
     return await _api.post(
       "/auth/verify-otp",
       {
-        "email": email,
+        "identifier": email,
         "purpose": purpose,
         "code": code,
       },
@@ -78,7 +78,7 @@ class AuthRepository {
     return await _api.post(
       "/auth/reset-password",
       {
-        "email": email,
+        "identifier": email,
         "code": code,
         "password": password,
       },

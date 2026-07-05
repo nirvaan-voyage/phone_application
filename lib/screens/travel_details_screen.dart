@@ -11,6 +11,8 @@ import '../widgets/multi_select_chips.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/searchable_dropdown.dart';
 
+import 'questionnaire/QuestionnaireScreen.dart';
+
 class TravelDetailsScreen extends ConsumerStatefulWidget {
   const TravelDetailsScreen({super.key});
 
@@ -146,17 +148,10 @@ class _TravelDetailsScreenState extends ConsumerState<TravelDetailsScreen> {
         .validate(_nameController.text, _ageController.text);
 
     if (isValid) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            'Journey planned!',
-            style: GoogleFonts.poppins(fontSize: 14),
-          ),
-          backgroundColor: AppColors.primary,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const QuestionnaireScreen(),
         ),
       );
     }
@@ -228,8 +223,9 @@ class _TravelDetailsScreenState extends ConsumerState<TravelDetailsScreen> {
                   const SizedBox(height: 20),
                   SearchableDropdown(
                     label: 'SELECT STATE *',
-                    hint:
-                        _statesLoading ? 'Loading states...' : 'Choose a state...',
+                    hint: _statesLoading
+                        ? 'Loading states...'
+                        : 'Choose a state...',
                     items: stateOptions,
                     selectedValue:
                         form.surpriseState ? 'Surprise Me' : form.selectedState,
@@ -565,9 +561,8 @@ class _DatePickerField extends StatelessWidget {
                     value.isEmpty ? AppStrings.dateHint : value,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
-                      color: value.isEmpty
-                          ? AppColors.hint
-                          : AppColors.textDark,
+                      color:
+                          value.isEmpty ? AppColors.hint : AppColors.textDark,
                     ),
                   ),
                 ),
@@ -650,9 +645,7 @@ class _CounterRow extends StatelessWidget {
             children: [
               _CountBtn(
                 icon: Icons.remove,
-                onTap: count > (label == 'Adults' ? 1 : 0)
-                    ? onDecrement
-                    : null,
+                onTap: count > (label == 'Adults' ? 1 : 0) ? onDecrement : null,
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
