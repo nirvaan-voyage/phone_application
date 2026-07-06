@@ -17,7 +17,8 @@ class QuestionOptionCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 220),
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
       margin: const EdgeInsets.only(bottom: 16),
       child: Material(
         color: Colors.transparent,
@@ -27,7 +28,7 @@ class QuestionOptionCard extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(
               horizontal: 20,
-              vertical: 18,
+              vertical: 22,
             ),
             decoration: BoxDecoration(
               color: isSelected
@@ -38,6 +39,15 @@ class QuestionOptionCard extends StatelessWidget {
                 color: isSelected ? AppColors.primary : Colors.grey.shade300,
                 width: isSelected ? 2 : 1,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: isSelected
+                      ? AppColors.primary.withOpacity(0.18)
+                      : Colors.black.withOpacity(0.04),
+                  blurRadius: isSelected ? 12 : 6,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: Row(
               children: [
@@ -45,7 +55,7 @@ class QuestionOptionCard extends StatelessWidget {
                   child: Text(
                     title,
                     style: GoogleFonts.poppins(
-                      fontSize: 16,
+                      fontSize: 17,
                       fontWeight: FontWeight.w600,
                       color: AppColors.textDark,
                     ),
@@ -55,7 +65,7 @@ class QuestionOptionCard extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   child: isSelected
                       ? const Icon(
-                          Icons.check_circle,
+                          Icons.check_circle_rounded,
                           color: AppColors.primary,
                           key: ValueKey("selected"),
                         )

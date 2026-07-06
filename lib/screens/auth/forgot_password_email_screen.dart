@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../repositories/auth_repository.dart';
+import '../../repositories/auth_repository.dart';
 import 'email_otp_screen.dart';
 
 class ForgotPasswordEmailScreen extends StatefulWidget {

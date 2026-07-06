@@ -110,6 +110,7 @@ const List<Question> questionnaireQuestions = [
   Question(
     id: "attractions",
     title: "What attractions interest you the most?",
+    multiple: true,
     options: [
       "Historical",
       "Nature",
@@ -121,6 +122,7 @@ const List<Question> questionnaireQuestions = [
   ),
   Question(
     id: "activities",
+    multiple: true,
     title: "Which activities would you like to experience?",
     options: [
       "Trekking",

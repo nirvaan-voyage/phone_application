@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../core/constants/app_colors.dart';
 import '../providers/auth_provider.dart';
-import '../screens/forgot_password_method_screen.dart';
+import '../screens/auth/forgot_password_method_screen.dart';
 import '../widgets/nirvaan_logo.dart';
 
 Future<bool> showAuthSheet(

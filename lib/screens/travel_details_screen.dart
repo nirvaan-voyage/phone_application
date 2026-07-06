@@ -11,7 +11,7 @@ import '../widgets/multi_select_chips.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/searchable_dropdown.dart';
 
-import 'questionnaire/QuestionnaireScreen.dart';
+import 'questionnaire/questionnaire_screen.dart';
 
 class TravelDetailsScreen extends ConsumerStatefulWidget {
   const TravelDetailsScreen({super.key});

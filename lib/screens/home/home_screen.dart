@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../core/constants/app_colors.dart';
-import 'login_screen.dart';
+import '../../core/constants/app_colors.dart';
+import '../auth/login_screen.dart';
 import 'main_app_screen.dart';
 
 // ── Data model for each slide ──────────────────────────────────────────────
@@ -54,19 +54,19 @@ class _HomeScreenState extends State<HomeScreen> {
     _startAutoScroll();
   }
 
-void _startAutoScroll() {
-  _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
-    if (_currentPage < _slides.length - 1) {
-      _pageController.nextPage(
-        duration: const Duration(milliseconds: 600),
-        curve: Curves.easeInOut,
-      );
-    } else {
-      // Last slide reached — stop the timer
-      _autoScrollTimer?.cancel();
-    }
-  });
-}
+  void _startAutoScroll() {
+    _autoScrollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      if (_currentPage < _slides.length - 1) {
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 600),
+          curve: Curves.easeInOut,
+        );
+      } else {
+        // Last slide reached — stop the timer
+        _autoScrollTimer?.cancel();
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -87,13 +87,11 @@ void _startAutoScroll() {
     return Scaffold(
       body: Stack(
         children: [
-
           // ── Full screen PageView ─────────────────────────────────────
           PageView.builder(
             controller: _pageController,
             itemCount: _slides.length,
-            onPageChanged: (index) =>
-                setState(() => _currentPage = index),
+            onPageChanged: (index) => setState(() => _currentPage = index),
             itemBuilder: (_, index) => _SlideWidget(
               slide: _slides[index],
             ),
@@ -110,7 +108,6 @@ void _startAutoScroll() {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-
                     // Slide text (small + big)
                     _SlideText(slide: _slides[_currentPage]),
 
@@ -126,8 +123,7 @@ void _startAutoScroll() {
 
                     // CTA button — only on last slide
                     AnimatedOpacity(
-                      opacity:
-                          _currentPage == _slides.length - 1 ? 1.0 : 0.0,
+                      opacity: _currentPage == _slides.length - 1 ? 1.0 : 0.0,
                       duration: const Duration(milliseconds: 300),
                       child: _currentPage == _slides.length - 1
                           ? _LetsTourButton(onTap: _goToLogin)

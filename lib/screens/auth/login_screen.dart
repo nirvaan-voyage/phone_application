@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../core/constants/app_colors.dart';
-import '../widgets/auth_bottom_sheet.dart';
-import '../widgets/nirvaan_logo.dart';
+import '../../core/constants/app_colors.dart';
+import '../../widgets/auth_bottom_sheet.dart';
+import '../../widgets/nirvaan_logo.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});

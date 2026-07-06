@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'new_password_screen.dart';
-import '../repositories/auth_repository.dart';
+import '../../repositories/auth_repository.dart';
 
 class EmailOtpScreen extends StatefulWidget {
   final String email;

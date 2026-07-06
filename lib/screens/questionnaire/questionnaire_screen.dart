@@ -6,6 +6,7 @@ import '../../providers/questionnaire_provider.dart';
 import '../../widgets/primary_button.dart';
 import '../../widgets/question_option_card.dart';
 import 'review_screen.dart'; // <-- Make sure this exists
+import '../../widgets/progress_bar.dart';
 
 class QuestionnaireScreen extends ConsumerStatefulWidget {
   const QuestionnaireScreen({super.key});
@@ -16,8 +17,6 @@ class QuestionnaireScreen extends ConsumerStatefulWidget {
 }
 
 class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
-  String? selectedOption;
-
   @override
   Widget build(BuildContext context) {
     final questionnaire = ref.watch(questionnaireProvider);
@@ -47,6 +46,10 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            ProgressBar(
+              currentQuestion: questionnaire.currentQuestion + 1,
+              totalQuestions: questionnaireQuestions.length,
+            ),
             const SizedBox(height: 30),
             Expanded(
               child: ListView.builder(
@@ -56,11 +59,26 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
 
                   return QuestionOptionCard(
                     title: option,
-                    isSelected: selectedOption == option,
+                    isSelected: currentQuestion.multiple
+                        ? ((questionnaire.answers[currentQuestion.id]
+                                    as List<dynamic>?)
+                                ?.contains(option) ??
+                            false)
+                        : questionnaire.answers[currentQuestion.id] == option,
                     onTap: () {
-                      setState(() {
-                        selectedOption = option;
-                      });
+                      if (currentQuestion.multiple) {
+                        ref
+                            .read(questionnaireProvider.notifier)
+                            .toggleMultiAnswer(
+                              currentQuestion.id,
+                              option,
+                            );
+                      } else {
+                        ref.read(questionnaireProvider.notifier).saveAnswer(
+                              currentQuestion.id,
+                              option,
+                            );
+                      }
                     },
                   );
                 },
@@ -75,10 +93,6 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
                         ref
                             .read(questionnaireProvider.notifier)
                             .previousQuestion();
-
-                        setState(() {
-                          selectedOption = null;
-                        });
                       },
                       child: const Text("Previous"),
                     ),
@@ -89,21 +103,21 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
                   child: PrimaryButton(
                     label: isLastQuestion ? "Finish" : "Next",
                     onPressed: () {
-                      if (selectedOption == null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              "Please select an option.",
-                            ),
-                          ),
-                        );
-                        return;
-                      }
+                      final answer = questionnaire.answers[currentQuestion.id];
 
-                      ref.read(questionnaireProvider.notifier).saveAnswer(
-                            currentQuestion.id,
-                            selectedOption!,
+                      if (answer == null ||
+                          (answer is List && answer.isEmpty)) {
+                        {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Please select an option.",
+                              ),
+                            ),
                           );
+                          return;
+                        }
+                      }
 
                       if (isLastQuestion) {
                         Navigator.push(
@@ -116,10 +130,6 @@ class _QuestionnaireScreenState extends ConsumerState<QuestionnaireScreen> {
                       }
 
                       ref.read(questionnaireProvider.notifier).nextQuestion();
-
-                      setState(() {
-                        selectedOption = null;
-                      });
                     },
                   ),
                 ),

@@ -5,7 +5,7 @@ import '../core/data/questionnaire_data.dart';
 class QuestionnaireState {
   final String destination;
   final int currentQuestion;
-  final Map<String, String> answers;
+  final Map<String, dynamic> answers;
 
   const QuestionnaireState({
     this.destination = "",
@@ -16,7 +16,7 @@ class QuestionnaireState {
   QuestionnaireState copyWith({
     String? destination,
     int? currentQuestion,
-    Map<String, String>? answers,
+    Map<String, dynamic>? answers,
   }) {
     return QuestionnaireState(
       destination: destination ?? this.destination,
@@ -36,9 +36,32 @@ class QuestionnaireNotifier extends StateNotifier<QuestionnaireState> {
 
   /// Save answer for current question
   void saveAnswer(String questionId, String answer) {
-    final updatedAnswers = Map<String, String>.from(state.answers);
+    final updatedAnswers = Map<String, dynamic>.from(state.answers);
 
     updatedAnswers[questionId] = answer;
+
+    state = state.copyWith(
+      answers: updatedAnswers,
+    );
+  }
+
+  /// Toggle answer for multi-select questions
+  void toggleMultiAnswer(String questionId, String answer) {
+    final updatedAnswers = Map<String, dynamic>.from(state.answers);
+
+    List<String> selected = [];
+
+    if (updatedAnswers[questionId] != null) {
+      selected = List<String>.from(updatedAnswers[questionId]);
+    }
+
+    if (selected.contains(answer)) {
+      selected.remove(answer);
+    } else {
+      selected.add(answer);
+    }
+
+    updatedAnswers[questionId] = selected;
 
     state = state.copyWith(
       answers: updatedAnswers,

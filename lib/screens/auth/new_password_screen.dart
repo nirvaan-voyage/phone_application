@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'password_reset_success_screen.dart';
-import '../repositories/auth_repository.dart';
+import '../../repositories/auth_repository.dart';
 
 class NewPasswordScreen extends StatefulWidget {
   final String email;
