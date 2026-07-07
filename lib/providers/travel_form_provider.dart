@@ -112,8 +112,7 @@ class TravelFormNotifier extends Notifier<TravelFormState> {
     );
   }
 
-  void incrementAdults() =>
-      state = state.copyWith(adults: state.adults + 1);
+  void incrementAdults() => state = state.copyWith(adults: state.adults + 1);
 
   void decrementAdults() {
     if (state.adults > 1) {
@@ -140,7 +139,11 @@ class TravelFormNotifier extends Notifier<TravelFormState> {
   }
 
   void setCheckOut(DateTime date) {
-    state = state.copyWith(checkOut: date, clearDateError: true);
+    if (state.checkIn != null && !date.isAfter(state.checkIn!)) {
+      state = state.copyWith(dateError: 'Check-out must be after check-in');
+    } else {
+      state = state.copyWith(checkOut: date, clearDateError: true);
+    }
   }
 
   /// Validates the form. Returns true if valid, false otherwise.

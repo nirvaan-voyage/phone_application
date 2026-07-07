@@ -200,14 +200,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (response.statusCode == 201 || response.statusCode == 200) {
         // Registration succeeded — some backends auto-login and return a token
         final token = body['token'] as String?;
+        final user = body['user'] as Map<String, dynamic>? ?? {};
         if (token != null) {
           await persistAndApplySession(
             token: token,
-            email: email,
-            name: name,
-            username: username,
-            phone: phone,
-            age: age,
+            email: _readString(user, 'email') ?? email,
+            name: _readString(user, 'name') ?? name,
+            username: _readString(user, 'username') ?? username,
+            phone: _readString(user, 'phone') ?? phone,
+            age: _readInt(user, 'age') ?? age,
+            profilePhotoPath: _readProfilePhotoPath(user),
+            loginId: user['id']?.toString(),
           );
         } else {
           // No token on register — user should log in next
@@ -256,14 +259,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final token = body['token'] as String? ?? '';
         final user = body['user'] as Map<String, dynamic>? ?? {};
 
-        final email = user['email'] as String? ?? emailOrUsername;
-        final name = user['name'] as String?;
-        final username = user['username'] as String?;
-        final phone = user['phone'] as String?;
+        final email = _readString(user, 'email') ?? emailOrUsername;
+        final name = _readString(user, 'name');
+        final username = _readString(user, 'username');
+        final phone = _readString(user, 'phone');
+        final profilePhotoPath = _readProfilePhotoPath(user);
         final loginId = user['id']?.toString();
-        final age = user['age'] is int
-            ? user['age'] as int
-            : int.tryParse(user['age']?.toString() ?? '');
+        final age = _readInt(user, 'age');
 
         if (rememberMe) {
           await persistAndApplySession(
@@ -274,6 +276,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
             phone: phone,
             age: age,
             loginId: loginId,
+            profilePhotoPath: profilePhotoPath,
           );
         } else {
           // Session only — don't persist to storage
@@ -286,6 +289,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
             username: username,
             phone: phone,
             age: age,
+            profilePhotoPath: profilePhotoPath,
             loginId: loginId,
             rememberMe: false,
           );
@@ -338,14 +342,13 @@ class AuthNotifier extends StateNotifier<AuthState> {
         final token = body['token'] as String? ?? '';
         final user = body['user'] as Map<String, dynamic>? ?? {};
 
-        final userEmail = user['email'] as String? ?? email;
-        final userName = user['name'] as String?;
-        final username = user['username'] as String?;
-        final phone = user['phone'] as String?;
+        final userEmail = _readString(user, 'email') ?? email;
+        final userName = _readString(user, 'name');
+        final username = _readString(user, 'username');
+        final phone = _readString(user, 'phone');
+        final profilePhotoPath = _readProfilePhotoPath(user);
         final loginId = user['id']?.toString();
-        final age = user['age'] is int
-            ? user['age'] as int
-            : int.tryParse(user['age']?.toString() ?? '');
+        final age = _readInt(user, 'age');
 
         await persistAndApplySession(
           token: token,
@@ -354,6 +357,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           username: username,
           phone: phone,
           age: age,
+          profilePhotoPath: profilePhotoPath,
           loginId: loginId,
         );
 
@@ -399,6 +403,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
               'username': username,
               'phone': phone,
               'age': age,
+              'profilePhotoPath': profilePhotoPath,
             }),
           )
           .timeout(const Duration(seconds: 15));
@@ -408,8 +413,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       if (response.statusCode == 200) {
         final token = body['token'] as String? ?? state.token ?? '';
         final user = body['user'] as Map<String, dynamic>? ?? {};
-        final userEmail = user['email'] as String? ?? state.userEmail ?? '';
-        final name = user['name'] as String? ?? state.name;
+        final userEmail = _readString(user, 'email') ?? state.userEmail ?? '';
+        final name = _readString(user, 'name') ?? state.name;
+        final savedProfilePhotoPath = _readProfilePhotoPath(user) ??
+            profilePhotoPath ??
+            state.profilePhotoPath;
         final loginId = user['id']?.toString() ?? state.loginId;
 
         await persistAndApplySession(
@@ -419,7 +427,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           username: username,
           phone: phone,
           age: age,
-          profilePhotoPath: profilePhotoPath ?? state.profilePhotoPath,
+          profilePhotoPath: savedProfilePhotoPath,
           loginId: loginId,
         );
 
@@ -427,7 +435,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           username: username,
           phone: phone,
           age: age,
-          profilePhotoPath: profilePhotoPath ?? state.profilePhotoPath,
+          profilePhotoPath: savedProfilePhotoPath,
           isLoading: false,
         );
 
@@ -452,7 +460,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
             state.username!.isEmpty ||
             state.phone == null ||
             state.phone!.length != 10 ||
-            state.age == null);
+            state.age == null ||
+            state.profilePhotoPath == null ||
+            state.profilePhotoPath!.trim().isEmpty);
   }
 
   // ── OTP & Password Reset ────────────────────────────────────────────────
@@ -615,6 +625,24 @@ class AuthNotifier extends StateNotifier<AuthState> {
             body['msg'] ??
             'Something went wrong. Please try again.')
         .toString();
+  }
+
+  String? _readString(Map<String, dynamic> source, String key) {
+    final value = source[key];
+    if (value == null) return null;
+    final text = value.toString().trim();
+    return text.isEmpty ? null : text;
+  }
+
+  int? _readInt(Map<String, dynamic> source, String key) {
+    final value = source[key];
+    if (value is int) return value;
+    return int.tryParse(value?.toString() ?? '');
+  }
+
+  String? _readProfilePhotoPath(Map<String, dynamic> source) {
+    return _readString(source, 'profilePhotoPath') ??
+        _readString(source, 'profile_photo_path');
   }
 }
 

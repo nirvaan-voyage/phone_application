@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 
 import '../core/constants/app_colors.dart';
 import '../providers/auth_provider.dart';
@@ -20,12 +23,13 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
   final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _ageController = TextEditingController();
-  final _photoUrlController = TextEditingController();
 
   String? _usernameError;
   String? _phoneError;
   String? _ageError;
   String? _serverError;
+  String? _profilePhotoPath;
+  final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void initState() {
@@ -34,7 +38,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
     _usernameController.text = auth.username ?? '';
     _phoneController.text = auth.phone ?? '';
     _ageController.text = auth.age?.toString() ?? '';
-    _photoUrlController.text = auth.profilePhotoPath ?? '';
+    _profilePhotoPath = auth.profilePhotoPath;
   }
 
   @override
@@ -42,8 +46,29 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
     _usernameController.dispose();
     _phoneController.dispose();
     _ageController.dispose();
-    _photoUrlController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickProfilePhoto() async {
+    try {
+      final image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+        maxWidth: 1200,
+      );
+
+      if (image == null || !mounted) return;
+
+      setState(() {
+        _profilePhotoPath = image.path;
+        _serverError = null;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _serverError = 'Could not open photos. Please check app permissions.';
+      });
+    }
   }
 
   bool _validateFields() {
@@ -113,9 +138,7 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
       username: _usernameController.text.trim(),
       phone: _phoneController.text.trim(),
       age: int.parse(_ageController.text.trim()),
-      profilePhotoPath: _photoUrlController.text.trim().isEmpty
-          ? null
-          : _photoUrlController.text.trim(),
+      profilePhotoPath: _profilePhotoPath,
     );
 
     if (!mounted) return;
@@ -134,7 +157,8 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
-    final photoUrl = _photoUrlController.text.trim();
+    final photoPath = _profilePhotoPath?.trim() ?? '';
+    final hasLocalPhoto = photoPath.isNotEmpty && File(photoPath).existsSync();
 
     return Scaffold(
       backgroundColor: AppColors.white,
@@ -169,76 +193,37 @@ class _CompleteProfileScreenState extends ConsumerState<CompleteProfileScreen> {
 
               Column(
                 children: [
-                  CircleAvatar(
-                    radius: 42,
-                    backgroundColor: AppColors.inputFill,
-                    backgroundImage: photoUrl.startsWith('http')
-                        ? NetworkImage(photoUrl)
-                        : null,
-                    child: !photoUrl.startsWith('http')
-                        ? const Icon(
-                            Icons.add_a_photo_rounded,
-                            color: AppColors.primary,
-                            size: 30,
-                          )
-                        : null,
+                  GestureDetector(
+                    onTap: _pickProfilePhoto,
+                    child: CircleAvatar(
+                      radius: 42,
+                      backgroundColor: AppColors.inputFill,
+                      backgroundImage:
+                          hasLocalPhoto ? FileImage(File(photoPath)) : null,
+                      child: !hasLocalPhoto
+                          ? const Icon(
+                              Icons.add_a_photo_rounded,
+                              color: AppColors.primary,
+                              size: 30,
+                            )
+                          : null,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  Text(
-                    'Profile photo is optional',
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.primary,
+                  TextButton.icon(
+                    onPressed: _pickProfilePhoto,
+                    icon: const Icon(Icons.photo_library_rounded, size: 18),
+                    label: Text(
+                      hasLocalPhoto
+                          ? 'Change profile photo'
+                          : 'Add profile photo',
+                      style: GoogleFonts.poppins(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
-              ),
-
-              const SizedBox(height: 18),
-
-              TextField(
-                controller: _photoUrlController,
-                onChanged: (_) => setState(() {}),
-                keyboardType: TextInputType.url,
-                textInputAction: TextInputAction.next,
-                style: GoogleFonts.poppins(
-                  fontSize: 14,
-                  color: AppColors.textDark,
-                ),
-                decoration: InputDecoration(
-                  hintText: 'Profile photo URL (optional)',
-                  hintStyle: GoogleFonts.poppins(
-                    fontSize: 14,
-                    color: AppColors.hint,
-                  ),
-                  filled: true,
-                  fillColor: AppColors.inputFill,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 12,
-                  ),
-                  prefixIcon: const Icon(
-                    Icons.image_rounded,
-                    color: AppColors.hint,
-                    size: 20,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: AppColors.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(
-                      color: AppColors.primary,
-                      width: 1.5,
-                    ),
-                  ),
-                ),
               ),
 
               const SizedBox(height: 18),
