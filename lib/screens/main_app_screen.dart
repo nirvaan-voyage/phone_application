@@ -10,6 +10,8 @@ import 'complete_profile_screen.dart';
 import 'questionnaire/destination_screen.dart';
 import 'travel_details_screen.dart';
 import 'placeholder_screen.dart';
+import 'flight_screen.dart';
+import 'flight_results_screen.dart';
 
 // ── Auth-aware navigation helper ───────────────────────────────────────────
 Future<void> _navOrLogin(
@@ -1763,6 +1765,16 @@ class _CategoryPill extends ConsumerWidget {
       onTap: () {
         final info = _destinations[label];
         if (info == null) return;
+
+        if (label == 'Flights') {
+          _navOrLogin(
+            context,
+            ref,
+            const FlightScreen(),
+          );
+          return; // Stop here so it doesn't open the placeholder
+        }
+        
         _navOrLogin(
           context,
           ref,

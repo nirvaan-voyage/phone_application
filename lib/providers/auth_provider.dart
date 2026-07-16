@@ -22,13 +22,13 @@ class _StorageKeys {
 // Configure based on your testing environment:
 //   - Android emulator:  http://10.0.2.2:8080
 //   - iOS simulator:     http://localhost:8080
-//   - Physical device via USB debugging: http://127.0.0.1:8080
+//   - Physical device via USB debugging: 'http://192.168.10.13:8080'
 //   - Physical device via WiFi: http://[YOUR_WIFI_IP]:8080
 //   - Web/Desktop:       http://localhost:8080
 //
 // Current setup: physical Android phone connected by USB.
 // Run: adb reverse tcp:8080 tcp:8080
-const String _kBaseUrl = 'http://127.0.0.1:8080';
+const String _kBaseUrl = 'http://192.168.10.13:8080';
 
 // ── AuthState ──────────────────────────────────────────────────────────────
 /// Represents the full authentication state of the app.
