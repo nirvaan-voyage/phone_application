@@ -10,6 +10,7 @@ import 'complete_profile_screen.dart';
 import 'questionnaire/destination_screen.dart';
 import 'travel_details_screen.dart';
 import 'placeholder_screen.dart';
+import 'explore/destination_details_screen.dart';
 
 // ── Auth-aware navigation helper ───────────────────────────────────────────
 Future<void> _navOrLogin(
@@ -59,6 +60,61 @@ const List<List<Color>> _tagGradients = [
   [Color(0xFF5B92BE), Color(0xFF2A5480)],
 ];
 
+// ── Shared searchable content (used by Home search + Explore) ─────────────
+// (name, tag, rating, imageUrl)
+const List<(String, String, String, String)> _allDestinations = [
+  ('Manali', 'Mountains', '4.9', 'assets/images/manali.jpg'),
+  (
+    'Goa',
+    'Beaches',
+    '4.7',
+    'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400'
+  ),
+  ('Hampi', 'Heritage', '4.8', 'assets/images/hampi.jpg'),
+  (
+    'Ranthambore',
+    'Wildlife',
+    '4.6',
+    'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=400'
+  ),
+  ('Varanasi', 'Spiritual', '4.9', 'assets/images/Varanasi.jpg'),
+  ('Andaman', 'Beaches', '4.8', 'assets/images/Andaman.jpg'),
+  ('Spiti', 'Mountains', '4.9', 'assets/images/spiti.jpg'),
+  ('Mysore', 'Heritage', '4.7', 'assets/images/mysore.jpg'),
+];
+
+// (title, category, readTime, excerpt, gradientIndex)
+const List<(String, String, String, String, int)> _allGuides = [
+  (
+    'How to plan a peaceful 7-day Himachal route',
+    'Adventure',
+    '6 min read',
+    'A practical mountain itinerary with rest days, scenic stops, and safer transfers.',
+    0,
+  ),
+  (
+    'Kerala beyond the usual backwater trip',
+    'Nature',
+    '8 min read',
+    'Slow travel ideas across Kochi, Alleppey, Munnar, local food, and monsoon timing.',
+    4,
+  ),
+  (
+    'Rajasthan on a student budget',
+    'Budget',
+    '5 min read',
+    'Where to stay, what to skip, and how to stretch your budget across Jaipur and Udaipur.',
+    1,
+  ),
+  (
+    'Solo travel safety checklist for India',
+    'Safety',
+    '7 min read',
+    'Simple rules for arrivals, transport, sharing plans, and avoiding stressful surprises.',
+    3,
+  ),
+];
+
 class MainAppScreen extends ConsumerStatefulWidget {
   const MainAppScreen({super.key});
 
@@ -104,7 +160,6 @@ class _MainAppScreenState extends ConsumerState<MainAppScreen>
             _HomeTab(),
             _ExploreTab(),
             _ItineraryTab(),
-            _GuidesTab(),
             _ProfileTab(),
           ],
         ),
@@ -127,7 +182,6 @@ class _BottomNav extends StatelessWidget {
     (Icons.home_rounded, Icons.home_outlined, 'Home'),
     (Icons.explore_rounded, Icons.explore_outlined, 'Explore'),
     (Icons.map_rounded, Icons.map_outlined, 'Trips'),
-    (Icons.menu_book_rounded, Icons.menu_book_outlined, 'Guides'),
     (Icons.person_rounded, Icons.person_outlined, 'Profile'),
   ];
 
@@ -535,70 +589,8 @@ class _HeroHeader extends ConsumerWidget {
 
                   const SizedBox(height: 20),
 
-                  // Search bar
-                  Container(
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withOpacity(0.25),
-                        width: 1.2,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF3D3B8E).withOpacity(0.12),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
-                        ),
-                        BoxShadow(
-                          color: Colors.white.withOpacity(0.08),
-                          blurRadius: 6,
-                          spreadRadius: -2,
-                          offset: const Offset(-2, -2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          child: Icon(Icons.search_rounded,
-                              color: Colors.white.withOpacity(0.8), size: 22),
-                        ),
-                        Expanded(
-                          child: Text(
-                            'Search destinations, guides...',
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              color: Colors.white.withOpacity(0.6),
-                            ),
-                          ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.all(6),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.18),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Colors.white.withOpacity(0.3),
-                              width: 1,
-                            ),
-                          ),
-                          child: Text(
-                            'Search',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  // Search bar (real, searches destinations + guides)
+                  const _HomeSearchBar(),
 
                   const SizedBox(height: 16),
 
@@ -666,6 +658,201 @@ class _StatBadge extends StatelessWidget {
   }
 }
 
+// ── Home Search Bar (real search across destinations + guides) ────────────
+class _HomeSearchBar extends ConsumerStatefulWidget {
+  const _HomeSearchBar();
+
+  @override
+  ConsumerState<_HomeSearchBar> createState() => _HomeSearchBarState();
+}
+
+class _HomeSearchBarState extends ConsumerState<_HomeSearchBar> {
+  final _controller = TextEditingController();
+  String _query = '';
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  List<(String, String, String, String)> get _matchedDestinations {
+    if (_query.isEmpty) return const [];
+    final q = _query.toLowerCase();
+    return _allDestinations
+        .where((d) =>
+            d.$1.toLowerCase().contains(q) || d.$2.toLowerCase().contains(q))
+        .toList();
+  }
+
+  List<(String, String, String, String, int)> get _matchedGuides {
+    if (_query.isEmpty) return const [];
+    final q = _query.toLowerCase();
+    return _allGuides
+        .where((g) =>
+            g.$1.toLowerCase().contains(q) || g.$2.toLowerCase().contains(q))
+        .toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasResults =
+        _matchedDestinations.isNotEmpty || _matchedGuides.isNotEmpty;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: Colors.white.withOpacity(0.25),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF3D3B8E).withOpacity(0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.white.withOpacity(0.08),
+            blurRadius: 6,
+            spreadRadius: -2,
+            offset: const Offset(-2, -2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 52,
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  child: Icon(Icons.search_rounded,
+                      color: Colors.white.withOpacity(0.8), size: 22),
+                ),
+                Expanded(
+                  child: TextField(
+                    controller: _controller,
+                    onChanged: (v) => setState(() => _query = v.trim()),
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.white,
+                    ),
+                    cursorColor: Colors.white,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: InputBorder.none,
+                      hintText: 'Search destinations, guides...',
+                      hintStyle: GoogleFonts.poppins(
+                        fontSize: 13,
+                        color: Colors.white.withOpacity(0.6),
+                      ),
+                    ),
+                  ),
+                ),
+                if (_query.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(right: 12),
+                    child: GestureDetector(
+                      onTap: () => setState(() {
+                        _controller.clear();
+                        _query = '';
+                      }),
+                      child: Icon(Icons.close_rounded,
+                          color: Colors.white.withOpacity(0.7), size: 18),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (_query.isNotEmpty)
+            Container(
+              constraints: const BoxConstraints(maxHeight: 260),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
+              ),
+              child: !hasResults
+                  ? Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        'No matches for "$_query"',
+                        style: GoogleFonts.poppins(
+                          fontSize: 12,
+                          color: AppColors.textLight,
+                        ),
+                      ),
+                    )
+                  : ListView(
+                      shrinkWrap: true,
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      children: [
+                        for (final d in _matchedDestinations)
+                          ListTile(
+                            dense: true,
+                            leading: const Icon(Icons.place_rounded,
+                                color: AppColors.primary, size: 20),
+                            title: Text(d.$1,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textDark)),
+                            subtitle: Text(d.$2,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 11, color: AppColors.textLight)),
+                            onTap: () {
+                              FocusScope.of(context).unfocus();
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => DestinationDetailsScreen(
+                                    destinationName: d.$1,
+                                    imageUrl: d.$4,
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                        for (final g in _matchedGuides)
+                          ListTile(
+                            dense: true,
+                            leading: const Icon(Icons.article_rounded,
+                                color: AppColors.primary, size: 20),
+                            title: Text(g.$1,
+                                style: GoogleFonts.poppins(
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.textDark)),
+                            subtitle: Text('${g.$3} • ${g.$2}',
+                                style: GoogleFonts.poppins(
+                                    fontSize: 11, color: AppColors.textLight)),
+                            onTap: () {
+                              FocusScope.of(context).unfocus();
+                              _navOrLogin(
+                                context,
+                                ref,
+                                PlaceholderScreen(
+                                  title: g.$1,
+                                  icon: Icons.article_rounded,
+                                  subtitle: '${g.$3} - ${g.$2}',
+                                ),
+                              );
+                            },
+                          ),
+                      ],
+                    ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
 // ═══════════════════════════════════════════════════════════════════════════
 // EXPLORE TAB
 // ═══════════════════════════════════════════════════════════════════════════
@@ -687,140 +874,186 @@ class _ExploreTabState extends State<_ExploreTab> {
     'Spiritual'
   ];
 
-  static const _places = [
-    ('Manali', 'Mountains', '4.9', 'assets/images/manali.jpg'),
-    (
-      'Goa',
-      'Beaches',
-      '4.7',
-      'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400'
-    ),
-    ('Hampi', 'Heritage', '4.8', 'assets/images/hampi.jpg'),
-    (
-      'Ranthambore',
-      'Wildlife',
-      '4.6',
-      'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=400'
-    ),
-    ('Varanasi', 'Spiritual', '4.9', 'assets/images/Varanasi.jpg'),
-    ('Andaman', 'Beaches', '4.8', 'assets/images/Andaman.jpg'),
-    ('Spiti', 'Mountains', '4.9', 'assets/images/spiti.jpg'),
-    ('Mysore', 'Heritage', '4.7', 'assets/images/mysore.jpg'),
-  ];
+  final _searchController = TextEditingController();
+  String _query = '';
+
+  // Reuses the shared searchable content defined at the top of this file
+  // (the same lists the Home search bar searches).
+  static const _places = _allDestinations;
+  static const _guides = _allGuides;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final filtered = _activeFilter == 0
+    final query = _query.trim().toLowerCase();
+
+    // Destinations: filtered by category chip AND search query.
+    final byCategory = _activeFilter == 0
         ? _places
         : _places.where((p) => p.$2 == _filters[_activeFilter]).toList();
+    final filteredDestinations = query.isEmpty
+        ? byCategory
+        : byCategory
+            .where((p) =>
+                p.$1.toLowerCase().contains(query) ||
+                p.$2.toLowerCase().contains(query))
+            .toList();
+
+    // Travel guides: filtered by the same search query.
+    final filteredGuides = query.isEmpty
+        ? _guides
+        : _guides
+            .where((g) =>
+                g.$1.toLowerCase().contains(query) ||
+                g.$2.toLowerCase().contains(query))
+            .toList();
 
     return SafeArea(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      child: CustomScrollView(
+        slivers: [
           // Header
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
-            child: Text('Explore India',
-                style: GoogleFonts.poppins(
-                    fontSize: 26,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.textDark)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 24, 20, 0),
+              child: Text('Explore India',
+                  style: GoogleFonts.poppins(
+                      fontSize: 26,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.textDark)),
+            ),
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
-            child: Text('Discover your next adventure',
-                style: GoogleFonts.poppins(
-                    fontSize: 13, color: AppColors.textLight)),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+              child: Text('Discover your next adventure',
+                  style: GoogleFonts.poppins(
+                      fontSize: 13, color: AppColors.textLight)),
+            ),
           ),
 
-          // Search
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                color: const Color(0xFF3D6B9E).withOpacity(0.07),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: const Color(0xFF5B92BE).withOpacity(0.25),
-                  width: 1.2,
+          // 1. Search bar (real TextField — filters destinations + guides below)
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3D6B9E).withOpacity(0.07),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: const Color(0xFF5B92BE).withOpacity(0.25),
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color(0xFF3D3B8E).withOpacity(0.08),
+                      blurRadius: 12,
+                      spreadRadius: 1,
+                      offset: const Offset(0, 3),
+                    ),
+                    BoxShadow(
+                      color: Colors.white.withOpacity(0.7),
+                      blurRadius: 6,
+                      spreadRadius: -2,
+                      offset: const Offset(-2, -2),
+                    ),
+                  ],
                 ),
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color(0xFF3D3B8E).withOpacity(0.08),
-                    blurRadius: 12,
-                    spreadRadius: 1,
-                    offset: const Offset(0, 3),
-                  ),
-                  BoxShadow(
-                    color: Colors.white.withOpacity(0.7),
-                    blurRadius: 6,
-                    spreadRadius: -2,
-                    offset: const Offset(-2, -2),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 14),
-                    child: Icon(Icons.search_rounded,
-                        color: const Color(0xFF2A5480).withOpacity(0.7),
-                        size: 20),
-                  ),
-                  Text(
-                    'Search destinations, guides...', // change text per tab
-                    style: GoogleFonts.poppins(
-                        fontSize: 13,
-                        color: const Color(0xFF2A5480).withOpacity(0.45)),
-                  ),
-                ],
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14),
+                      child: Icon(Icons.search_rounded,
+                          color: const Color(0xFF2A5480).withOpacity(0.7),
+                          size: 20),
+                    ),
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        onChanged: (v) => setState(() => _query = v),
+                        style: GoogleFonts.poppins(
+                          fontSize: 13,
+                          color: AppColors.textDark,
+                        ),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          border: InputBorder.none,
+                          hintText: 'Search destinations, guides...',
+                          hintStyle: GoogleFonts.poppins(
+                            fontSize: 13,
+                            color: const Color(0xFF2A5480).withOpacity(0.45),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (_query.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: GestureDetector(
+                          onTap: () => setState(() {
+                            _searchController.clear();
+                            _query = '';
+                          }),
+                          child: const Icon(Icons.close_rounded,
+                              color: AppColors.hint, size: 18),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-          // Filter chips
-          SizedBox(
-            height: 36,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              itemCount: _filters.length,
-              itemBuilder: (_, i) => GestureDetector(
-                onTap: () => setState(() => _activeFilter = i),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  margin: const EdgeInsets.only(right: 10),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  decoration: BoxDecoration(
-                    gradient: _activeFilter == i
-                        ? const LinearGradient(
-                            colors: [AppColors.primaryDark, AppColors.primary])
-                        : null,
-                    color: _activeFilter == i ? null : Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
+          // 2. Destination category chips
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 36,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemCount: _filters.length,
+                itemBuilder: (_, i) => GestureDetector(
+                  onTap: () => setState(() => _activeFilter = i),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    margin: const EdgeInsets.only(right: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      gradient: _activeFilter == i
+                          ? const LinearGradient(colors: [
+                              AppColors.primaryDark,
+                              AppColors.primary
+                            ])
+                          : null,
+                      color: _activeFilter == i ? null : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _activeFilter == i
+                              ? AppColors.primary.withOpacity(0.3)
+                              : Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      _filters[i],
+                      style: GoogleFonts.poppins(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
                         color: _activeFilter == i
-                            ? AppColors.primary.withOpacity(0.3)
-                            : Colors.black.withOpacity(0.05),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
+                            ? Colors.white
+                            : AppColors.textDark,
                       ),
-                    ],
-                  ),
-                  child: Text(
-                    _filters[i],
-                    style: GoogleFonts.poppins(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: _activeFilter == i
-                          ? Colors.white
-                          : AppColors.textDark,
                     ),
                   ),
                 ),
@@ -828,28 +1061,116 @@ class _ExploreTabState extends State<_ExploreTab> {
             ),
           ),
 
-          const SizedBox(height: 16),
+          const SliverToBoxAdapter(child: SizedBox(height: 16)),
 
-          // Grid
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 14,
-                mainAxisSpacing: 14,
-                childAspectRatio: 0.82,
+          // 3. Destination grid
+          if (filteredDestinations.isEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'No destinations match "$_query"',
+                  style: GoogleFonts.poppins(
+                      fontSize: 13, color: AppColors.textLight),
+                ),
               ),
-              itemCount: filtered.length,
-              itemBuilder: (_, i) => _ExploreGridCard(
-                name: filtered[i].$1,
-                tag: filtered[i].$2,
-                rating: filtered[i].$3,
-                imageUrl: filtered[i].$4,
-                gradientIndex: i % _tagGradients.length,
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverGrid(
+                gridDelegate:
+                    const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 14,
+                  mainAxisSpacing: 14,
+                  childAspectRatio: 0.82,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (_, i) {
+                    final place = filteredDestinations[i];
+                    return GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => DestinationDetailsScreen(
+                              destinationName: place.$1,
+                              imageUrl: place.$4,
+                            ),
+                          ),
+                        );
+                      },
+                      child: _ExploreGridCard(
+                        name: place.$1,
+                        tag: place.$2,
+                        rating: place.$3,
+                        imageUrl: place.$4,
+                        gradientIndex: i % _tagGradients.length,
+                      ),
+                    );
+                  },
+                  // Bounded by the actual filtered list length — this is what
+                  // fixed the "index should be less than 8" RangeError, which
+                  // was caused by GridView.builder/SliverChildBuilderDelegate
+                  // having no itemCount/childCount and building past the end
+                  // of the underlying list.
+                  childCount: filteredDestinations.length,
+                ),
               ),
             ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 28)),
+
+          // 4. "Travel Guides" section header
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Text('Travel Guides',
+                  style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textDark)),
+            ),
           ),
+          const SliverToBoxAdapter(child: SizedBox(height: 12)),
+
+          // 5. Existing guide/blog cards (reusing _BlogPostCard as-is)
+          if (filteredGuides.isEmpty)
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Text(
+                  'No guides match "$_query"',
+                  style: GoogleFonts.poppins(
+                      fontSize: 13, color: AppColors.textLight),
+                ),
+              ),
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              sliver: SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (_, i) {
+                    final guide = filteredGuides[i];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
+                      child: _BlogPostCard(
+                        title: guide.$1,
+                        category: guide.$2,
+                        readTime: guide.$3,
+                        excerpt: guide.$4,
+                        gradientIndex: guide.$5,
+                      ),
+                    );
+                  },
+                  childCount: filteredGuides.length,
+                ),
+              ),
+            ),
+
+          const SliverToBoxAdapter(child: SizedBox(height: 100)),
         ],
       ),
     );
@@ -1043,133 +1364,6 @@ class _ItineraryTab extends ConsumerWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// GUIDES TAB
-// ═══════════════════════════════════════════════════════════════════════════
-class _GuidesTab extends ConsumerWidget {
-  const _GuidesTab();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SafeArea(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.only(bottom: 100),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
-              child: Text('Travel Blog',
-                  style: GoogleFonts.poppins(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.textDark)),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              child: Text('Stories, routes, tips, and city guides',
-                  style: GoogleFonts.poppins(
-                      fontSize: 13, color: AppColors.textLight)),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
-                      blurRadius: 12,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 14),
-                      child: Icon(Icons.search_rounded,
-                          color: AppColors.primary, size: 20),
-                    ),
-                    Text('Search guides...',
-                        style: GoogleFonts.poppins(
-                            fontSize: 13, color: AppColors.hint)),
-                  ],
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 38,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                children: const [
-                  _BlogFilter(label: 'All'),
-                  _BlogFilter(label: 'Adventure'),
-                  _BlogFilter(label: 'Budget'),
-                  _BlogFilter(label: 'Food'),
-                  _BlogFilter(label: 'Culture'),
-                  _BlogFilter(label: 'Safety'),
-                ],
-              ),
-            ),
-            const SizedBox(height: 22),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: _BlogPostCard(
-                title: 'How to plan a peaceful 7-day Himachal route',
-                category: 'Adventure',
-                readTime: '6 min read',
-                excerpt:
-                    'A practical mountain itinerary with rest days, scenic stops, and safer transfers.',
-                gradientIndex: 0,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: _BlogPostCard(
-                title: 'Kerala beyond the usual backwater trip',
-                category: 'Nature',
-                readTime: '8 min read',
-                excerpt:
-                    'Slow travel ideas across Kochi, Alleppey, Munnar, local food, and monsoon timing.',
-                gradientIndex: 4,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: _BlogPostCard(
-                title: 'Rajasthan on a student budget',
-                category: 'Budget',
-                readTime: '5 min read',
-                excerpt:
-                    'Where to stay, what to skip, and how to stretch your budget across Jaipur and Udaipur.',
-                gradientIndex: 1,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: _BlogPostCard(
-                title: 'Solo travel safety checklist for India',
-                category: 'Safety',
-                readTime: '7 min read',
-                excerpt:
-                    'Simple rules for arrivals, transport, sharing plans, and avoiding stressful surprises.',
-                gradientIndex: 3,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -2536,36 +2730,6 @@ class _ExploreGridCard extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _BlogFilter extends StatelessWidget {
-  const _BlogFilter({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final isAll = label == 'All';
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: isAll ? AppColors.primary : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isAll ? AppColors.primary : AppColors.border,
-        ),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.poppins(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: isAll ? Colors.white : AppColors.textMid,
-        ),
       ),
     );
   }
