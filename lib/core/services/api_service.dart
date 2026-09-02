@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:nirvaan/models/flight_model.dart'; 
+import 'package:nirvaan/models/flight_model.dart';
 
 class ApiService {
-  final String baseUrl = "http://192.168.10.13:8080";
+  final String baseUrl = "http://127.0.0.1:8080";
 
   // ── Existing Auth/OTP POST Method ──────────────────────────────────────────
   Future<Map<String, dynamic>> post(
@@ -47,14 +47,16 @@ class ApiService {
   }
 
   // ── 2. The Flight Search Integration ───────────────────────────────────────
-  Future<List<Flight>> searchFlights(String from, String to, String date) async {
+  Future<List<Flight>> searchFlights(
+      String from, String to, String date) async {
     try {
       // Use your clean new GET method!
-      final response = await get('/api/flights/search?from=$from&to=$to&date=$date');
+      final response =
+          await get('/api/flights/search?from=$from&to=$to&date=$date');
 
       if (response['success'] == true) {
         final List<dynamic> data = response['data'];
-        
+
         // Map the raw JSON list into clean Dart Flight objects
         return data.map((json) => Flight.fromJson(json)).toList();
       } else {
