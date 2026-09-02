@@ -340,6 +340,12 @@ class _HomeTab extends ConsumerWidget {
                     name: 'Ishan', city: 'Mumbai', specialty: 'Food'),
                 _MiniGuideCard(
                     name: 'Naina', city: 'Kochi', specialty: 'Nature'),
+                _MiniGuideCard(
+                    name: 'Rohan', city: 'Varanasi', specialty: 'Spiritual'),
+                _MiniGuideCard(
+                    name: 'Zoya', city: 'Hyderabad', specialty: 'Food Walks'),
+                _MiniGuideCard(
+                    name: 'Dev', city: 'Shillong', specialty: 'Hidden Gems'),
               ],
             ),
           ),
@@ -1120,6 +1126,12 @@ class _GuidesTab extends ConsumerWidget {
                       name: 'Ishan', city: 'Mumbai', specialty: 'Food'),
                   _MiniGuideCard(
                       name: 'Naina', city: 'Kochi', specialty: 'Nature'),
+                  _MiniGuideCard(
+                      name: 'Rohan', city: 'Varanasi', specialty: 'Spiritual'),
+                  _MiniGuideCard(
+                      name: 'Zoya', city: 'Hyderabad', specialty: 'Food Walks'),
+                  _MiniGuideCard(
+                      name: 'Dev', city: 'Shillong', specialty: 'Hidden Gems'),
                 ],
               ),
             ),
