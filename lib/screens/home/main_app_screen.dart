@@ -1,12 +1,16 @@
+import 'dart:io';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../../core/constants/app_colors.dart';
-import '../../providers/auth_provider.dart';
-import '../../widgets/auth_bottom_sheet.dart';
-import '../travel_details_screen.dart';
-import '../placeholder_screen.dart';
+import '../core/constants/app_colors.dart';
+import '../providers/auth_provider.dart';
+import '../widgets/auth_bottom_sheet.dart';
+import 'complete_profile_screen.dart';
+import 'questionnaire/destination_screen.dart';
+import 'travel_details_screen.dart';
+import 'placeholder_screen.dart';
+import 'explore/destination_details_screen.dart';
 
 // ── Auth-aware navigation helper ───────────────────────────────────────────
 Future<void> _navOrLogin(
@@ -56,6 +60,99 @@ const List<List<Color>> _tagGradients = [
   [Color(0xFF5B92BE), Color(0xFF2A5480)],
 ];
 
+// ── Shared search data (used by Home search + merged Explore/Guides tab) ──
+const List<(String, String, String, String)> _exploreDestinations = [
+  ('Manali', 'Mountains', '4.9', 'assets/images/manali.jpg'),
+  (
+    'Goa',
+    'Beaches',
+    '4.7',
+    'https://images.unsplash.com/photo-1512343879784-a960bf40e7f2?w=400'
+  ),
+  ('Hampi', 'Heritage', '4.8', 'assets/images/hampi.jpg'),
+  (
+    'Ranthambore',
+    'Wildlife',
+    '4.6',
+    'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=400'
+  ),
+  ('Varanasi', 'Spiritual', '4.9', 'assets/images/Varanasi.jpg'),
+  ('Andaman', 'Beaches', '4.8', 'assets/images/Andaman.jpg'),
+  ('Spiti', 'Mountains', '4.9', 'assets/images/spiti.jpg'),
+  ('Mysore', 'Heritage', '4.7', 'assets/images/mysore.jpg'),
+];
+
+const List<
+    ({
+      String title,
+      String category,
+      String readTime,
+      String excerpt,
+      int gradientIndex
+    })> _blogPosts = [
+  (
+    title: 'How to plan a peaceful 7-day Himachal route',
+    category: 'Adventure',
+    readTime: '6 min read',
+    excerpt:
+        'A practical mountain itinerary with rest days, scenic stops, and safer transfers.',
+    gradientIndex: 0,
+  ),
+  (
+    title: 'Kerala beyond the usual backwater trip',
+    category: 'Nature',
+    readTime: '8 min read',
+    excerpt:
+        'Slow travel ideas across Kochi, Alleppey, Munnar, local food, and monsoon timing.',
+    gradientIndex: 4,
+  ),
+  (
+    title: 'Rajasthan on a student budget',
+    category: 'Budget',
+    readTime: '5 min read',
+    excerpt:
+        'Where to stay, what to skip, and how to stretch your budget across Jaipur and Udaipur.',
+    gradientIndex: 1,
+  ),
+  (
+    title: 'Solo travel safety checklist for India',
+    category: 'Safety',
+    readTime: '7 min read',
+    excerpt:
+        'Simple rules for arrivals, transport, sharing plans, and avoiding stressful surprises.',
+    gradientIndex: 3,
+  ),
+];
+
+bool _matchesSearch(String haystack, String query) =>
+    haystack.toLowerCase().contains(query.trim().toLowerCase());
+
+List<(String, String, String, String)> _filterDestinations(String query) {
+  final q = query.trim();
+  if (q.isEmpty) return _exploreDestinations;
+  return _exploreDestinations
+      .where((d) => _matchesSearch(d.$1, q) || _matchesSearch(d.$2, q))
+      .toList();
+}
+
+List<
+    ({
+      String title,
+      String category,
+      String readTime,
+      String excerpt,
+      int gradientIndex
+    })> _filterBlogPosts(String query) {
+  final q = query.trim();
+  if (q.isEmpty) return _blogPosts;
+  return _blogPosts
+      .where((b) =>
+          _matchesSearch(b.title, q) ||
+          _matchesSearch(b.category, q) ||
+          _matchesSearch(b.excerpt, q))
+      .toList();
+}
+
 class MainAppScreen extends ConsumerStatefulWidget {
   const MainAppScreen({super.key});
 
@@ -101,7 +198,6 @@ class _MainAppScreenState extends ConsumerState<MainAppScreen>
             _HomeTab(),
             _ExploreTab(),
             _ItineraryTab(),
-            _GuidesTab(),
             _ProfileTab(),
           ],
         ),
@@ -124,7 +220,6 @@ class _BottomNav extends StatelessWidget {
     (Icons.home_rounded, Icons.home_outlined, 'Home'),
     (Icons.explore_rounded, Icons.explore_outlined, 'Explore'),
     (Icons.map_rounded, Icons.map_outlined, 'Trips'),
-    (Icons.menu_book_rounded, Icons.menu_book_outlined, 'Guides'),
     (Icons.person_rounded, Icons.person_outlined, 'Profile'),
   ];
 
@@ -139,7 +234,7 @@ class _BottomNav extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
+            color: Colors.black.withOpacity(0.10),
             blurRadius: 24,
             offset: const Offset(0, -6),
           ),
@@ -229,85 +324,7 @@ class _HomeTab extends ConsumerWidget {
                     fontWeight: FontWeight.w700,
                     color: AppColors.textDark)),
           ),
-          SizedBox(
-            height: 92,
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              children: const [
-                _CategoryPill(
-                    icon: Icons.place_rounded,
-                    label: 'Destinations',
-                    gradientIndex: 0),
-                _CategoryPill(
-                    icon: Icons.map_rounded,
-                    label: 'Itineraries',
-                    gradientIndex: 1),
-                _CategoryPill(
-                    icon: Icons.menu_book_rounded,
-                    label: 'Guides',
-                    gradientIndex: 2),
-                _CategoryPill(
-                    icon: Icons.flight_rounded,
-                    label: 'Flights',
-                    gradientIndex: 3),
-                _CategoryPill(
-                    icon: Icons.hotel_rounded,
-                    label: 'Hotels',
-                    gradientIndex: 4),
-                _CategoryPill(
-                    icon: Icons.train_rounded,
-                    label: 'Trains',
-                    gradientIndex: 5),
-                _CategoryPill(
-                    icon: Icons.confirmation_number_rounded,
-                    label: 'Shows',
-                    gradientIndex: 0),
-                _CategoryPill(
-                    icon: Icons.groups_rounded,
-                    label: 'Collab',
-                    gradientIndex: 1),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    height: 4,
-                    decoration: BoxDecoration(
-                      color: AppColors.border,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    alignment: Alignment.centerLeft,
-                    child: FractionallySizedBox(
-                      widthFactor: 0.34,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                Icon(Icons.chevron_right_rounded,
-                    size: 18, color: AppColors.primary),
-                Text(
-                  'Swipe',
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
+          const _DiscoverCategoryScroller(),
 
           const SizedBox(height: 28),
 
@@ -480,6 +497,20 @@ class _HeroHeader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final photoPath = auth.profilePhotoPath;
+    final hasLocalPhoto = photoPath != null &&
+        photoPath.isNotEmpty &&
+        !photoPath.startsWith('http') &&
+        File(photoPath).existsSync();
+    ImageProvider? profileImage;
+    if (photoPath != null && photoPath.isNotEmpty) {
+      if (photoPath.startsWith('http')) {
+        profileImage = NetworkImage(photoPath);
+      } else if (hasLocalPhoto) {
+        profileImage = FileImage(File(photoPath));
+      }
+    }
+
     return Container(
       decoration: const BoxDecoration(
         gradient: LinearGradient(
@@ -503,7 +534,7 @@ class _HeroHeader extends ConsumerWidget {
               height: 160,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Colors.white.withOpacity(0.05),
               ),
             ),
           ),
@@ -515,7 +546,7 @@ class _HeroHeader extends ConsumerWidget {
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.07),
+                color: Colors.white.withOpacity(0.07),
               ),
             ),
           ),
@@ -568,19 +599,27 @@ class _HeroHeader extends ConsumerWidget {
                           height: 46,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: Colors.white.withValues(alpha: 0.15),
+                            color: Colors.white.withOpacity(0.15),
+                            image: profileImage == null
+                                ? null
+                                : DecorationImage(
+                                    image: profileImage,
+                                    fit: BoxFit.cover,
+                                  ),
                             border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
+                              color: Colors.white.withOpacity(0.3),
                               width: 1.5,
                             ),
                           ),
-                          child: Icon(
-                            auth.isLoggedIn
-                                ? Icons.person_rounded
-                                : Icons.person_outline_rounded,
-                            color: Colors.white,
-                            size: 24,
-                          ),
+                          child: profileImage == null
+                              ? Icon(
+                                  auth.isLoggedIn
+                                      ? Icons.person_rounded
+                                      : Icons.person_outline_rounded,
+                                  color: Colors.white,
+                                  size: 24,
+                                )
+                              : null,
                         ),
                       ),
                     ],
@@ -589,69 +628,79 @@ class _HeroHeader extends ConsumerWidget {
                   const SizedBox(height: 20),
 
                   // Search bar
-                  Container(
-                    height: 52,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: Colors.white.withValues(alpha: 0.25),
-                        width: 1.2,
+                  GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const _GlobalSearchScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 52,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.25),
+                          width: 1.2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF3D3B8E).withOpacity(0.12),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                          BoxShadow(
+                            color: Colors.white.withOpacity(0.08),
+                            blurRadius: 6,
+                            spreadRadius: -2,
+                            offset: const Offset(-2, -2),
+                          ),
+                        ],
                       ),
-                      boxShadow: [
-                        BoxShadow(
-                          color:
-                              const Color(0xFF3D3B8E).withValues(alpha: 0.12),
-                          blurRadius: 16,
-                          offset: const Offset(0, 4),
-                        ),
-                        BoxShadow(
-                          color: Colors.white.withValues(alpha: 0.08),
-                          blurRadius: 6,
-                          spreadRadius: -2,
-                          offset: const Offset(-2, -2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 14),
-                          child: Icon(Icons.search_rounded,
-                              color: Colors.white.withValues(alpha: 0.8),
-                              size: 22),
-                        ),
-                        Expanded(
-                          child: Text(
-                            'Search destinations, guides...',
-                            style: GoogleFonts.poppins(
-                              fontSize: 13,
-                              color: Colors.white.withValues(alpha: 0.6),
+                      child: Row(
+                        children: [
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 14),
+                            child: Icon(Icons.search_rounded,
+                                color: Colors.white.withOpacity(0.8),
+                                size: 22),
+                          ),
+                          Expanded(
+                            child: Text(
+                              'Search destinations, guides...',
+                              style: GoogleFonts.poppins(
+                                fontSize: 13,
+                                color: Colors.white.withOpacity(0.6),
+                              ),
                             ),
                           ),
-                        ),
-                        Container(
-                          margin: const EdgeInsets.all(6),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.18),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: Colors.white.withValues(alpha: 0.3),
-                              width: 1,
+                          Container(
+                            margin: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.18),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.3),
+                                width: 1,
+                              ),
+                            ),
+                            child: Text(
+                              'Search',
+                              style: GoogleFonts.poppins(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
-                          child: Text(
-                            'Search',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
 
@@ -700,9 +749,9 @@ class _StatBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.12),
+        color: Colors.white.withOpacity(0.12),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+        border: Border.all(color: Colors.white.withOpacity(0.2)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -757,8 +806,8 @@ class _ExploreTabState extends State<_ExploreTab> {
       '4.6',
       'https://images.unsplash.com/photo-1561731216-c3a4d99437d5?w=400'
     ),
-    ('Varanasi', 'Spiritual', '4.9', 'assets/images/varanasi.jpg'),
-    ('Andaman', 'Beaches', '4.8', 'assets/images/andaman.jpg'),
+    ('Varanasi', 'Spiritual', '4.9', 'assets/images/Varanasi.jpg'),
+    ('Andaman', 'Beaches', '4.8', 'assets/images/Andaman.jpg'),
     ('Spiti', 'Mountains', '4.9', 'assets/images/spiti.jpg'),
     ('Mysore', 'Heritage', '4.7', 'assets/images/mysore.jpg'),
   ];
@@ -795,21 +844,21 @@ class _ExploreTabState extends State<_ExploreTab> {
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFF3D6B9E).withValues(alpha: 0.07),
+                color: const Color(0xFF3D6B9E).withOpacity(0.07),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: const Color(0xFF5B92BE).withValues(alpha: 0.25),
+                  color: const Color(0xFF5B92BE).withOpacity(0.25),
                   width: 1.2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF3D3B8E).withValues(alpha: 0.08),
+                    color: const Color(0xFF3D3B8E).withOpacity(0.08),
                     blurRadius: 12,
                     spreadRadius: 1,
                     offset: const Offset(0, 3),
                   ),
                   BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.7),
+                    color: Colors.white.withOpacity(0.7),
                     blurRadius: 6,
                     spreadRadius: -2,
                     offset: const Offset(-2, -2),
@@ -821,14 +870,14 @@ class _ExploreTabState extends State<_ExploreTab> {
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 14),
                     child: Icon(Icons.search_rounded,
-                        color: const Color(0xFF2A5480).withValues(alpha: 0.7),
+                        color: const Color(0xFF2A5480).withOpacity(0.7),
                         size: 20),
                   ),
                   Text(
                     'Search destinations, guides...', // change text per tab
                     style: GoogleFonts.poppins(
                         fontSize: 13,
-                        color: const Color(0xFF2A5480).withValues(alpha: 0.45)),
+                        color: const Color(0xFF2A5480).withOpacity(0.45)),
                   ),
                 ],
               ),
@@ -861,8 +910,8 @@ class _ExploreTabState extends State<_ExploreTab> {
                     boxShadow: [
                       BoxShadow(
                         color: _activeFilter == i
-                            ? AppColors.primary.withValues(alpha: 0.3)
-                            : Colors.black.withValues(alpha: 0.05),
+                            ? AppColors.primary.withOpacity(0.3)
+                            : Colors.black.withOpacity(0.05),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -895,14 +944,30 @@ class _ExploreTabState extends State<_ExploreTab> {
                 mainAxisSpacing: 14,
                 childAspectRatio: 0.82,
               ),
-              itemCount: filtered.length,
-              itemBuilder: (_, i) => _ExploreGridCard(
-                name: filtered[i].$1,
-                tag: filtered[i].$2,
-                rating: filtered[i].$3,
-                imageUrl: filtered[i].$4,
-                gradientIndex: i % _tagGradients.length,
-              ),
+              itemBuilder: (_, i) {
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    debugPrint("Tapped ${filtered[i].$1}");
+
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) => DestinationDetailsScreen(
+                          destinationName: filtered[i].$1,
+                          imageUrl: filtered[i].$4,
+                        ),
+                      ),
+                    );
+                  },
+                  child: _ExploreGridCard(
+                    name: filtered[i].$1,
+                    tag: filtered[i].$2,
+                    rating: filtered[i].$3,
+                    imageUrl: filtered[i].$4,
+                    gradientIndex: i % _tagGradients.length,
+                  ),
+                );
+              },
             ),
           ),
         ],
@@ -970,7 +1035,7 @@ class _ItineraryTab extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.35),
+                      color: AppColors.primary.withOpacity(0.35),
                       blurRadius: 20,
                       offset: const Offset(0, 6),
                     ),
@@ -986,7 +1051,7 @@ class _ItineraryTab extends ConsumerWidget {
                         child: Icon(
                           Icons.map_rounded,
                           size: 100,
-                          color: Colors.white.withValues(alpha: 0.06),
+                          color: Colors.white.withOpacity(0.06),
                         ),
                       ),
                     ),
@@ -998,7 +1063,7 @@ class _ItineraryTab extends ConsumerWidget {
                             width: 48,
                             height: 48,
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.15),
+                              color: Colors.white.withOpacity(0.15),
                               borderRadius: BorderRadius.circular(14),
                             ),
                             child: const Icon(Icons.add_rounded,
@@ -1140,7 +1205,7 @@ class _GuidesTab extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.06),
+                      color: Colors.black.withOpacity(0.06),
                       blurRadius: 12,
                       offset: const Offset(0, 2),
                     ),
@@ -1329,7 +1394,7 @@ class _ProfileTab extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.35),
+                          color: AppColors.primary.withOpacity(0.35),
                           blurRadius: 16,
                           offset: const Offset(0, 4),
                         ),
@@ -1399,6 +1464,33 @@ class _ProfileTab extends ConsumerWidget {
     }
 
     // Logged in profile
+    final completedFields = [
+      auth.name?.trim().isNotEmpty == true,
+      auth.userEmail?.trim().isNotEmpty == true,
+      auth.username?.trim().isNotEmpty == true,
+      auth.phone?.trim().length == 10,
+      auth.age != null,
+      auth.profilePhotoPath?.trim().isNotEmpty == true,
+    ].where((done) => done).length;
+    final progress = completedFields / 6;
+    final needsCompletion = auth.username?.trim().isEmpty != false ||
+        auth.phone?.trim().length != 10 ||
+        auth.age == null ||
+        auth.profilePhotoPath?.trim().isEmpty != false;
+    final photoPath = auth.profilePhotoPath?.trim();
+    final hasLocalPhoto = photoPath != null &&
+        photoPath.isNotEmpty &&
+        !photoPath.startsWith('http') &&
+        File(photoPath).existsSync();
+    ImageProvider? profileImage;
+    if (photoPath != null && photoPath.isNotEmpty) {
+      if (photoPath.startsWith('http')) {
+        profileImage = NetworkImage(photoPath);
+      } else if (hasLocalPhoto) {
+        profileImage = FileImage(File(photoPath));
+      }
+    }
+
     return SafeArea(
       child: SingleChildScrollView(
         child: Column(
@@ -1420,17 +1512,38 @@ class _ProfileTab extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(20, 32, 20, 32),
               child: Column(
                 children: [
-                  Container(
-                    width: 80,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white.withValues(alpha: 0.2),
-                      border: Border.all(
-                          color: Colors.white.withValues(alpha: 0.4), width: 2),
+                  SizedBox(
+                    width: 98,
+                    height: 98,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        SizedBox(
+                          width: 98,
+                          height: 98,
+                          child: CircularProgressIndicator(
+                            value: progress,
+                            strokeWidth: 4,
+                            backgroundColor: Colors.white.withOpacity(0.25),
+                            valueColor: const AlwaysStoppedAnimation<Color>(
+                              Color(0xFF8EC5FF),
+                            ),
+                          ),
+                        ),
+                        CircleAvatar(
+                          radius: 40,
+                          backgroundColor: Colors.white.withOpacity(0.2),
+                          backgroundImage: profileImage,
+                          child: profileImage == null
+                              ? const Icon(
+                                  Icons.person_rounded,
+                                  size: 44,
+                                  color: Colors.white,
+                                )
+                              : null,
+                        ),
+                      ],
                     ),
-                    child: const Icon(Icons.person_rounded,
-                        size: 44, color: Colors.white),
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -1447,6 +1560,41 @@ class _ProfileTab extends ConsumerWidget {
                     style: GoogleFonts.poppins(
                         fontSize: 13, color: Colors.white60),
                   ),
+                  if (needsCompletion) ...[
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const CompleteProfileScreen(),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.14),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: const Color(0xFF8EC5FF),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          'Complete profile',
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFFDBEDFF),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -1577,7 +1725,7 @@ class _SectionHeader extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.08),
+                color: AppColors.primary.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text('See all',
@@ -1589,6 +1737,121 @@ class _SectionHeader extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _DiscoverCategoryScroller extends StatefulWidget {
+  const _DiscoverCategoryScroller();
+
+  @override
+  State<_DiscoverCategoryScroller> createState() =>
+      _DiscoverCategoryScrollerState();
+}
+
+class _DiscoverCategoryScrollerState extends State<_DiscoverCategoryScroller> {
+  final ScrollController _controller = ScrollController();
+  double _progress = 0;
+
+  static const _items = [
+    (Icons.place_rounded, 'Destinations', 0),
+    (Icons.map_rounded, 'Itineraries', 1),
+    (Icons.menu_book_rounded, 'Guides', 2),
+    (Icons.flight_rounded, 'Flights', 3),
+    (Icons.hotel_rounded, 'Hotels', 4),
+    (Icons.train_rounded, 'Trains', 5),
+    (Icons.confirmation_number_rounded, 'Shows', 0),
+    (Icons.groups_rounded, 'Collab', 1),
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(_updateProgress);
+  }
+
+  @override
+  void dispose() {
+    _controller
+      ..removeListener(_updateProgress)
+      ..dispose();
+    super.dispose();
+  }
+
+  void _updateProgress() {
+    if (!_controller.hasClients || !_controller.position.hasContentDimensions) {
+      return;
+    }
+    final max = _controller.position.maxScrollExtent;
+    final value = max <= 0 ? 0.0 : (_controller.offset / max).clamp(0.0, 1.0);
+    if ((value - _progress).abs() > 0.01) {
+      setState(() => _progress = value);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 92,
+          child: ListView.builder(
+            controller: _controller,
+            primary: false,
+            physics: const BouncingScrollPhysics(),
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: _items.length,
+            itemBuilder: (context, index) {
+              final item = _items[index];
+              return _CategoryPill(
+                icon: item.$1,
+                label: item.$2,
+                gradientIndex: item.$3,
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 8),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.border,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  alignment: Alignment.centerLeft,
+                  child: FractionallySizedBox(
+                    widthFactor: 0.34 + (_progress * 0.66),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 120),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Icon(Icons.chevron_right_rounded,
+                  size: 18, color: AppColors.primary),
+              Text(
+                'Swipe',
+                style: GoogleFonts.poppins(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
@@ -1636,21 +1899,21 @@ class _CategoryPill extends ConsumerWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: const Color(0xFF3D6B9E).withValues(alpha: 0.10),
+                color: const Color(0xFF3D6B9E).withOpacity(0.10),
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: const Color(0xFF5B92BE).withValues(alpha: 0.30),
+                  color: const Color(0xFF5B92BE).withOpacity(0.30),
                   width: 1.2,
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: const Color(0xFF1D3F63).withValues(alpha: 0.12),
+                    color: const Color(0xFF1D3F63).withOpacity(0.12),
                     blurRadius: 12,
                     spreadRadius: 1,
                     offset: const Offset(0, 4),
                   ),
                   BoxShadow(
-                    color: Colors.white.withValues(alpha: 0.6),
+                    color: Colors.white.withOpacity(0.6),
                     blurRadius: 6,
                     spreadRadius: -2,
                     offset: const Offset(-2, -2),
@@ -1658,8 +1921,7 @@ class _CategoryPill extends ConsumerWidget {
                 ],
               ),
               child: Icon(icon,
-                  color: const Color(0xFF2A5480).withValues(alpha: 0.85),
-                  size: 26),
+                  color: const Color(0xFF2A5480).withOpacity(0.85), size: 26),
             ),
             const SizedBox(height: 8),
             Text(label,
@@ -1680,29 +1942,18 @@ class _PlanJourneyCTA extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return GestureDetector(
-      onTap: () async {
-        final isLoggedIn = ref.read(authProvider).isLoggedIn;
-        if (!isLoggedIn) {
-          final ok = await showAuthSheet(context);
-          if (ok && context.mounted) {
-            _goToHomeAfterAuth(context);
-          }
-          return;
-        }
-
-        if (context.mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const TravelDetailsScreen()),
-          );
-        }
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const DestinationScreen()),
+        );
       },
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(22),
           boxShadow: [
             BoxShadow(
-              color: const Color(0xFF1D3F63).withValues(alpha: 0.35),
+              color: const Color(0xFF1D3F63).withOpacity(0.35),
               blurRadius: 20,
               offset: const Offset(0, 6),
             ),
@@ -1728,7 +1979,7 @@ class _PlanJourneyCTA extends ConsumerWidget {
                 child: Transform.rotate(
                   angle: -math.pi / 8,
                   child: Icon(Icons.flight_rounded,
-                      size: 120, color: Colors.white.withValues(alpha: 0.08)),
+                      size: 120, color: Colors.white.withOpacity(0.08)),
                 ),
               ),
               Padding(
@@ -1751,7 +2002,7 @@ class _PlanJourneyCTA extends ConsumerWidget {
                       width: 44,
                       height: 44,
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withOpacity(0.2),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Icons.arrow_forward_rounded,
@@ -1792,7 +2043,7 @@ class _SmartGuideMatchCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withValues(alpha: 0.25),
+              color: AppColors.primary.withOpacity(0.25),
               blurRadius: 18,
               offset: const Offset(0, 6),
             ),
@@ -1804,7 +2055,7 @@ class _SmartGuideMatchCard extends ConsumerWidget {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.16),
+                color: Colors.white.withOpacity(0.16),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: const Icon(Icons.auto_awesome_rounded,
@@ -1868,7 +2119,7 @@ class _MiniGuideCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -1879,7 +2130,7 @@ class _MiniGuideCard extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 22,
-              backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+              backgroundColor: AppColors.primary.withOpacity(0.12),
               child: Text(
                 name.isNotEmpty ? name[0] : '?',
                 style: GoogleFonts.poppins(
@@ -1949,7 +2200,7 @@ class _EventTypeCard extends ConsumerWidget {
               width: 42,
               height: 42,
               decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.10),
+                color: AppColors.primary.withOpacity(0.10),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icon, color: AppColors.primary, size: 22),
@@ -2009,9 +2260,9 @@ class _CollabChip extends ConsumerWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         decoration: BoxDecoration(
-          color: AppColors.primary.withValues(alpha: 0.08),
+          color: AppColors.primary.withOpacity(0.08),
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: AppColors.primary.withValues(alpha: 0.16)),
+          border: Border.all(color: AppColors.primary.withOpacity(0.16)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -2055,7 +2306,7 @@ class _FeaturedCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: colors[0].withValues(alpha: 0.2),
+            color: colors[0].withOpacity(0.2),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -2083,7 +2334,7 @@ class _FeaturedCard extends StatelessWidget {
                   stops: const [0.3, 1.0],
                   colors: [
                     Colors.transparent,
-                    Colors.black.withValues(alpha: 0.75),
+                    Colors.black.withOpacity(0.75),
                   ],
                 ),
               ),
@@ -2110,7 +2361,7 @@ class _FeaturedCard extends StatelessWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withValues(alpha: 0.45),
+                  color: Colors.black.withOpacity(0.45),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -2174,7 +2425,7 @@ class _ItineraryCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withOpacity(0.06),
             blurRadius: 16,
             offset: const Offset(0, 4),
           ),
@@ -2209,8 +2460,8 @@ class _ItineraryCard extends ConsumerWidget {
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                       colors: [
-                        colors[0].withValues(alpha: 0.15),
-                        colors[1].withValues(alpha: 0.15),
+                        colors[0].withOpacity(0.15),
+                        colors[1].withOpacity(0.15),
                       ]),
                   borderRadius: BorderRadius.circular(14),
                 ),
@@ -2248,8 +2499,8 @@ class _ItineraryCard extends ConsumerWidget {
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(colors: [
-                            colors[0].withValues(alpha: 0.15),
-                            colors[1].withValues(alpha: 0.15),
+                            colors[0].withOpacity(0.15),
+                            colors[1].withOpacity(0.15),
                           ]),
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -2297,7 +2548,7 @@ class _ItineraryCard extends ConsumerWidget {
                         borderRadius: BorderRadius.circular(10),
                         boxShadow: [
                           BoxShadow(
-                            color: colors[0].withValues(alpha: 0.35),
+                            color: colors[0].withOpacity(0.35),
                             blurRadius: 8,
                             offset: const Offset(0, 3),
                           ),
@@ -2338,7 +2589,11 @@ class _ExploreGridCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = _tagGradients[gradientIndex % _tagGradients.length];
 
-    return ClipRRect(
+    return GestureDetector(
+          onTap: () {
+            debugPrint("CARD TAPPED: $name");
+          },
+          child: ClipRRect(
       borderRadius: BorderRadius.circular(20),
       child: Stack(
         fit: StackFit.expand,
@@ -2358,7 +2613,7 @@ class _ExploreGridCard extends StatelessWidget {
                 stops: const [0.4, 1.0],
                 colors: [
                   Colors.transparent,
-                  Colors.black.withValues(alpha: 0.7),
+                  Colors.black.withOpacity(0.7),
                 ],
               ),
             ),
@@ -2406,8 +2661,8 @@ class _ExploreGridCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
+    ),
+  };
 }
 
 class _BlogFilter extends StatelessWidget {
@@ -2476,7 +2731,7 @@ class _BlogPostCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 14,
               offset: const Offset(0, 4),
             ),
@@ -2588,7 +2843,7 @@ class _GuideCard extends ConsumerWidget {
           borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: Colors.black.withOpacity(0.05),
               blurRadius: 12,
               offset: const Offset(0, 3),
             ),
@@ -2607,7 +2862,7 @@ class _GuideCard extends ConsumerWidget {
                 borderRadius: BorderRadius.circular(14),
                 boxShadow: [
                   BoxShadow(
-                    color: colors[0].withValues(alpha: 0.3),
+                    color: colors[0].withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -2634,8 +2889,8 @@ class _GuideCard extends ConsumerWidget {
                             horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(colors: [
-                            colors[0].withValues(alpha: 0.15),
-                            colors[1].withValues(alpha: 0.15),
+                            colors[0].withOpacity(0.15),
+                            colors[1].withOpacity(0.15),
                           ]),
                           borderRadius: BorderRadius.circular(6),
                         ),
@@ -2662,8 +2917,8 @@ class _GuideCard extends ConsumerWidget {
               height: 32,
               decoration: BoxDecoration(
                 gradient: LinearGradient(colors: [
-                  colors[0].withValues(alpha: 0.12),
-                  colors[1].withValues(alpha: 0.12),
+                  colors[0].withOpacity(0.12),
+                  colors[1].withOpacity(0.12),
                 ]),
                 shape: BoxShape.circle,
               ),
@@ -2712,7 +2967,7 @@ class _ProfileTile extends ConsumerWidget {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
+              color: Colors.black.withOpacity(0.04),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -2724,15 +2979,14 @@ class _ProfileTile extends ConsumerWidget {
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFF3D6B9E).withValues(alpha: 0.10),
+                color: const Color(0xFF3D6B9E).withOpacity(0.10),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFF5B92BE).withValues(alpha: 0.25),
+                  color: const Color(0xFF5B92BE).withOpacity(0.25),
                 ),
               ),
               child: Icon(icon,
-                  color: const Color(0xFF2A5480).withValues(alpha: 0.8),
-                  size: 20),
+                  color: const Color(0xFF2A5480).withOpacity(0.8), size: 20),
             ),
             const SizedBox(width: 14),
             Expanded(
