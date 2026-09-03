@@ -99,7 +99,7 @@ class AuthService {
     FlutterSecureStorage? secureStorage,
     this.baseUrl = const String.fromEnvironment(
       'NIRVAAN_API_URL',
-      defaultValue: 'http://localhost:8080',
+      defaultValue: 'http://127.0.0.1:8080',
     ),
   })  : _client = client ?? http.Client(),
         _secureStorage = secureStorage ?? const FlutterSecureStorage();
@@ -134,6 +134,70 @@ class AuthService {
     final registerResponse = RegisterResponse.fromJson(body);
     await saveToken(registerResponse.token);
     return registerResponse;
+  }
+  // --- ADD THESE 3 METHODS BELOW YOUR register() METHOD ---
+
+  Future<void> generateOTP(
+      {required String email, required String purpose}) async {
+    final response = await _client.post(
+      Uri.parse('$baseUrl/auth/generate-otp'),
+      headers: const {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'purpose': purpose,
+      }),
+    );
+
+    if (response.statusCode >= 300) {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      throw AuthApiException(
+        message: body['error'] ?? body['message'] ?? 'Failed to send OTP',
+      );
+    }
+  }
+
+  Future<void> verifyOTP(
+      {required String email,
+      required String purpose,
+      required String code}) async {
+    final response = await _client.post(
+      Uri.parse('$baseUrl/auth/verify-otp'),
+      headers: const {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'purpose': purpose,
+        'code': code,
+      }),
+    );
+
+    if (response.statusCode >= 300) {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      throw AuthApiException(
+        message: body['error'] ?? body['message'] ?? 'Invalid or expired OTP',
+      );
+    }
+  }
+
+  Future<void> resetPassword(
+      {required String email,
+      required String code,
+      required String password}) async {
+    final response = await _client.post(
+      Uri.parse('$baseUrl/auth/reset-password'),
+      headers: const {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'code': code,
+        'password': password,
+      }),
+    );
+
+    if (response.statusCode >= 300) {
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+      throw AuthApiException(
+        message: body['error'] ?? body['message'] ?? 'Failed to reset password',
+      );
+    }
   }
 
   Future<void> saveToken(String token) {

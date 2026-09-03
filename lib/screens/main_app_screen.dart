@@ -8,8 +8,8 @@ import '../providers/auth_provider.dart';
 import '../widgets/auth_bottom_sheet.dart';
 import 'complete_profile_screen.dart';
 import 'questionnaire/destination_screen.dart';
-import 'travel_details_screen.dart';
 import 'placeholder_screen.dart';
+import 'travel_search_screen.dart';
 
 // ── Auth-aware navigation helper ───────────────────────────────────────────
 Future<void> _navOrLogin(
@@ -322,11 +322,6 @@ class _HomeTab extends ConsumerWidget {
 
           _SectionHeader(title: 'Guide', onSeeAll: () {}),
           const SizedBox(height: 14),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: _SmartGuideMatchCard(),
-          ),
-          const SizedBox(height: 14),
           SizedBox(
             height: 156,
             child: ListView(
@@ -344,6 +339,12 @@ class _HomeTab extends ConsumerWidget {
                     name: 'Ishan', city: 'Mumbai', specialty: 'Food'),
                 _MiniGuideCard(
                     name: 'Naina', city: 'Kochi', specialty: 'Nature'),
+                _MiniGuideCard(
+                    name: 'Rohan', city: 'Varanasi', specialty: 'Spiritual'),
+                _MiniGuideCard(
+                    name: 'Zoya', city: 'Hyderabad', specialty: 'Food Walks'),
+                _MiniGuideCard(
+                    name: 'Dev', city: 'Shillong', specialty: 'Hidden Gems'),
               ],
             ),
           ),
@@ -901,7 +902,7 @@ class _ItineraryTab extends ConsumerWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const TravelDetailsScreen()),
+                        builder: (_) => const DestinationScreen()),
                   );
                 }
               },
@@ -1064,7 +1065,7 @@ class _GuidesTab extends ConsumerWidget {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 24, 20, 4),
-              child: Text('Travel Blog',
+              child: Text('Guides',
                   style: GoogleFonts.poppins(
                       fontSize: 26,
                       fontWeight: FontWeight.w800,
@@ -1072,7 +1073,7 @@ class _GuidesTab extends ConsumerWidget {
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 0, 20, 16),
-              child: Text('Stories, routes, tips, and city guides',
+              child: Text('Choose from Nirvaan test guides across India',
                   style: GoogleFonts.poppins(
                       fontSize: 13, color: AppColors.textLight)),
             ),
@@ -1105,67 +1106,32 @@ class _GuidesTab extends ConsumerWidget {
                 ),
               ),
             ),
-            SizedBox(
-              height: 38,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+            const SizedBox(height: 18),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Wrap(
+                spacing: 12,
+                runSpacing: 12,
                 children: const [
-                  _BlogFilter(label: 'All'),
-                  _BlogFilter(label: 'Adventure'),
-                  _BlogFilter(label: 'Budget'),
-                  _BlogFilter(label: 'Food'),
-                  _BlogFilter(label: 'Culture'),
-                  _BlogFilter(label: 'Safety'),
+                  _MiniGuideCard(
+                      name: 'Aarav', city: 'Delhi', specialty: 'Heritage'),
+                  _MiniGuideCard(
+                      name: 'Mira', city: 'Goa', specialty: 'Beaches'),
+                  _MiniGuideCard(
+                      name: 'Kabir', city: 'Jaipur', specialty: 'Culture'),
+                  _MiniGuideCard(
+                      name: 'Tara', city: 'Manali', specialty: 'Adventure'),
+                  _MiniGuideCard(
+                      name: 'Ishan', city: 'Mumbai', specialty: 'Food'),
+                  _MiniGuideCard(
+                      name: 'Naina', city: 'Kochi', specialty: 'Nature'),
+                  _MiniGuideCard(
+                      name: 'Rohan', city: 'Varanasi', specialty: 'Spiritual'),
+                  _MiniGuideCard(
+                      name: 'Zoya', city: 'Hyderabad', specialty: 'Food Walks'),
+                  _MiniGuideCard(
+                      name: 'Dev', city: 'Shillong', specialty: 'Hidden Gems'),
                 ],
-              ),
-            ),
-            const SizedBox(height: 22),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: _BlogPostCard(
-                title: 'How to plan a peaceful 7-day Himachal route',
-                category: 'Adventure',
-                readTime: '6 min read',
-                excerpt:
-                    'A practical mountain itinerary with rest days, scenic stops, and safer transfers.',
-                gradientIndex: 0,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: _BlogPostCard(
-                title: 'Kerala beyond the usual backwater trip',
-                category: 'Nature',
-                readTime: '8 min read',
-                excerpt:
-                    'Slow travel ideas across Kochi, Alleppey, Munnar, local food, and monsoon timing.',
-                gradientIndex: 4,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: _BlogPostCard(
-                title: 'Rajasthan on a student budget',
-                category: 'Budget',
-                readTime: '5 min read',
-                excerpt:
-                    'Where to stay, what to skip, and how to stretch your budget across Jaipur and Udaipur.',
-                gradientIndex: 1,
-              ),
-            ),
-            const SizedBox(height: 12),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: _BlogPostCard(
-                title: 'Solo travel safety checklist for India',
-                category: 'Safety',
-                readTime: '7 min read',
-                excerpt:
-                    'Simple rules for arrivals, transport, sharing plans, and avoiding stressful surprises.',
-                gradientIndex: 3,
               ),
             ),
           ],
@@ -1202,7 +1168,7 @@ class _ProfileTab extends ConsumerWidget {
               ),
             ),
 
-            const Spacer(),
+            const SizedBox(height: 10),
 
             // Greyscale avatar
             ColorFiltered(
@@ -1640,6 +1606,7 @@ class _DiscoverCategoryScrollerState extends State<_DiscoverCategoryScroller> {
     (Icons.flight_rounded, 'Flights', 3),
     (Icons.hotel_rounded, 'Hotels', 4),
     (Icons.train_rounded, 'Trains', 5),
+    (Icons.directions_bus_rounded, 'Buses', 0),
     (Icons.confirmation_number_rounded, 'Shows', 0),
     (Icons.groups_rounded, 'Collab', 1),
   ];
@@ -1753,6 +1720,7 @@ class _CategoryPill extends ConsumerWidget {
     'Flights': (Icons.flight_rounded, 'Book Flights'),
     'Hotels': (Icons.hotel_rounded, 'Find Hotels'),
     'Trains': (Icons.train_rounded, 'Book Trains'),
+    'Buses': (Icons.directions_bus_rounded, 'Book Buses'),
     'Shows': (Icons.confirmation_number_rounded, 'Shows & Events'),
     'Collab': (Icons.groups_rounded, 'Plan Together'),
   };
@@ -1763,6 +1731,39 @@ class _CategoryPill extends ConsumerWidget {
       onTap: () {
         final info = _destinations[label];
         if (info == null) return;
+
+        if (label == 'Itineraries') {
+          context.findAncestorStateOfType<_MainAppScreenState>()?._onTabTap(2);
+          return;
+        }
+
+        if (label == 'Guides') {
+          context.findAncestorStateOfType<_MainAppScreenState>()?._onTabTap(3);
+          return;
+        }
+
+        final category = switch (label) {
+          'Flights' => 'flights',
+          'Hotels' => 'hotels',
+          'Trains' => 'trains',
+          'Buses' => 'buses',
+          'Shows' => 'shows',
+          _ => null,
+        };
+
+        if (category != null) {
+          _navOrLogin(
+            context,
+            ref,
+            TravelSearchScreen(
+              category: category,
+              title: info.$2,
+              icon: info.$1,
+            ),
+          );
+          return;
+        }
+
         _navOrLogin(
           context,
           ref,
@@ -1899,74 +1900,6 @@ class _PlanJourneyCTA extends ConsumerWidget {
   }
 }
 
-class _SmartGuideMatchCard extends ConsumerWidget {
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return GestureDetector(
-      onTap: () => _navOrLogin(
-        context,
-        ref,
-        const PlaceholderScreen(
-          title: 'Smart Guide Match',
-          icon: Icons.auto_awesome_rounded,
-          subtitle: 'Let Nirvaan choose the best guide for your trip.',
-        ),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          gradient: const LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFF2A5480), Color(0xFF0F2744)],
-          ),
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.primary.withOpacity(0.25),
-              blurRadius: 18,
-              offset: const Offset(0, 6),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.16),
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Icon(Icons.auto_awesome_rounded,
-                  color: Colors.white, size: 24),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Smart Guide Match',
-                      style: GoogleFonts.poppins(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white)),
-                  const SizedBox(height: 3),
-                  Text('Let the app choose a guide for your route and style',
-                      style: GoogleFonts.poppins(
-                          fontSize: 11, color: Colors.white70, height: 1.35)),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward_rounded,
-                color: Colors.white, size: 20),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
 class _MiniGuideCard extends ConsumerWidget {
   const _MiniGuideCard({
     required this.name,
@@ -2028,7 +1961,7 @@ class _MiniGuideCard extends ConsumerWidget {
             Text(city,
                 style: GoogleFonts.poppins(
                     fontSize: 11, color: AppColors.textLight)),
-            const Spacer(),
+            const SizedBox(height: 10),
             Text(specialty,
                 style: GoogleFonts.poppins(
                     fontSize: 11,
@@ -2085,7 +2018,7 @@ class _EventTypeCard extends ConsumerWidget {
               ),
               child: Icon(icon, color: AppColors.primary, size: 22),
             ),
-            const Spacer(),
+            const SizedBox(height: 10),
             Text(title,
                 style: GoogleFonts.poppins(
                     fontSize: 14,
@@ -2541,149 +2474,6 @@ class _ExploreGridCard extends StatelessWidget {
   }
 }
 
-class _BlogFilter extends StatelessWidget {
-  const _BlogFilter({required this.label});
-
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    final isAll = label == 'All';
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-      decoration: BoxDecoration(
-        color: isAll ? AppColors.primary : Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: isAll ? AppColors.primary : AppColors.border,
-        ),
-      ),
-      child: Text(
-        label,
-        style: GoogleFonts.poppins(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: isAll ? Colors.white : AppColors.textMid,
-        ),
-      ),
-    );
-  }
-}
-
-class _BlogPostCard extends ConsumerWidget {
-  const _BlogPostCard({
-    required this.title,
-    required this.category,
-    required this.readTime,
-    required this.excerpt,
-    required this.gradientIndex,
-  });
-
-  final String title;
-  final String category;
-  final String readTime;
-  final String excerpt;
-  final int gradientIndex;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final colors = _tagGradients[gradientIndex % _tagGradients.length];
-
-    return GestureDetector(
-      onTap: () => _navOrLogin(
-        context,
-        ref,
-        PlaceholderScreen(
-          title: title,
-          icon: Icons.article_rounded,
-          subtitle: '$readTime - $category',
-        ),
-      ),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 14,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(colors: colors),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Text(
-                category,
-                style: GoogleFonts.poppins(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                color: AppColors.textDark,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              excerpt,
-              style: GoogleFonts.poppins(
-                fontSize: 12,
-                color: AppColors.textLight,
-                height: 1.45,
-              ),
-            ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Icon(Icons.schedule_rounded, size: 14, color: colors[0]),
-                const SizedBox(width: 4),
-                Text(
-                  readTime,
-                  style: GoogleFonts.poppins(
-                    fontSize: 11,
-                    color: colors[0],
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const Spacer(),
-                Text(
-                  'Read',
-                  style: GoogleFonts.poppins(
-                    fontSize: 12,
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(Icons.arrow_forward_rounded,
-                    size: 15, color: AppColors.primary),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ignore: unused_element
 class _GuideCard extends ConsumerWidget {
   const _GuideCard({
     required this.title,
