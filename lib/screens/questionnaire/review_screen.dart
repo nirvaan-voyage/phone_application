@@ -1,15 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../core/services/itinerary_service.dart';
 import '../../providers/questionnaire_provider.dart';
 import '../../widgets/primary_button.dart';
-import '../guides/guide_list_screen.dart';
+import 'generated_itinerary_screen.dart';
 
-class ReviewScreen extends ConsumerWidget {
+class ReviewScreen extends ConsumerStatefulWidget {
   const ReviewScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ReviewScreen> createState() => _ReviewScreenState();
+}
+
+class _ReviewScreenState extends ConsumerState<ReviewScreen> {
+  final ItineraryService _itineraryService = ItineraryService();
+  bool _isGenerating = false;
+  String? _error;
+
+  Future<void> _generateTrip() async {
+    final questionnaire = ref.read(questionnaireProvider);
+    setState(() {
+      _isGenerating = true;
+      _error = null;
+    });
+
+    try {
+      final itinerary = await _itineraryService.generate(
+        destination: questionnaire.destination,
+        answers: questionnaire.answers,
+      );
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => GeneratedItineraryScreen(itinerary: itinerary),
+        ),
+      );
+    } catch (error) {
+      if (!mounted) return;
+      setState(() {
+        _error = error.toString().replaceFirst('Exception: ', '');
+      });
+    } finally {
+      if (mounted) {
+        setState(() => _isGenerating = false);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final questionnaire = ref.watch(questionnaireProvider);
 
     final titles = {
@@ -77,7 +118,7 @@ class ReviewScreen extends ConsumerWidget {
                       borderRadius: BorderRadius.circular(18),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
+                          color: Colors.black.withValues(alpha: 0.05),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -136,16 +177,26 @@ class ReviewScreen extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 12),
+            if (_error != null) ...[
+              Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 12),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.red.withValues(alpha: 0.25)),
+                ),
+                child: Text(
+                  _error!,
+                  style: const TextStyle(color: Colors.red),
+                ),
+              ),
+            ],
             PrimaryButton(
               label: "Generate My Trip",
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const GuideListScreen(),
-                  ),
-                );
-              },
+              isLoading: _isGenerating,
+              onPressed: _generateTrip,
             ),
           ],
         ),
