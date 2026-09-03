@@ -9,7 +9,6 @@ import '../widgets/auth_bottom_sheet.dart';
 import 'complete_profile_screen.dart';
 import 'questionnaire/destination_screen.dart';
 import 'placeholder_screen.dart';
-import 'flight_screen.dart';
 import 'travel_search_screen.dart';
 
 // ── Auth-aware navigation helper ───────────────────────────────────────────
@@ -1743,16 +1742,8 @@ class _CategoryPill extends ConsumerWidget {
           return;
         }
 
-        if (label == 'Flights') {
-          _navOrLogin(
-            context,
-            ref,
-            const FlightScreen(),
-          );
-          return; // Stop here so it doesn't open the placeholder
-        }
-
         final category = switch (label) {
+          'Flights' => 'flights',
           'Hotels' => 'hotels',
           'Trains' => 'trains',
           'Buses' => 'buses',

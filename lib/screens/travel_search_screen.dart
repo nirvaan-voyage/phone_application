@@ -22,14 +22,18 @@ class TravelSearchScreen extends StatefulWidget {
 
 class _TravelSearchScreenState extends State<TravelSearchScreen> {
   final _service = TravelSearchService();
-  final _fromController = TextEditingController(text: 'Delhi');
-  final _toController = TextEditingController(text: 'Mumbai');
-  final _cityController = TextEditingController(text: 'Mumbai');
+  late final TextEditingController _fromController;
+  late final TextEditingController _toController;
+  late final TextEditingController _cityController;
   late Future<List<TravelSearchItem>> _future;
 
   @override
   void initState() {
     super.initState();
+    final defaults = _defaultInputsFor(widget.category);
+    _fromController = TextEditingController(text: defaults.from);
+    _toController = TextEditingController(text: defaults.to);
+    _cityController = TextEditingController(text: defaults.city);
     _future = _search();
   }
 
@@ -62,7 +66,14 @@ class _TravelSearchScreenState extends State<TravelSearchScreen> {
   }
 
   bool get _usesRoute =>
-      widget.category == 'trains' || widget.category == 'buses';
+      widget.category == 'trains' ||
+      widget.category == 'buses' ||
+      widget.category == 'flights';
+
+  String get _fromLabel =>
+      widget.category == 'trains' ? 'From station code' : 'From';
+
+  String get _toLabel => widget.category == 'trains' ? 'To station code' : 'To';
 
   @override
   Widget build(BuildContext context) {
@@ -85,7 +96,10 @@ class _TravelSearchScreenState extends State<TravelSearchScreen> {
                 ? _RouteInputs(
                     onSearch: _refresh,
                     fromController: _fromController,
-                    toController: _toController)
+                    toController: _toController,
+                    fromLabel: _fromLabel,
+                    toLabel: _toLabel,
+                  )
                 : _CityInput(onSearch: _refresh, controller: _cityController),
           ),
           Expanded(
@@ -138,20 +152,24 @@ class _RouteInputs extends StatelessWidget {
     required this.onSearch,
     required this.fromController,
     required this.toController,
+    required this.fromLabel,
+    required this.toLabel,
   });
 
   final VoidCallback onSearch;
   final TextEditingController fromController;
   final TextEditingController toController;
+  final String fromLabel;
+  final String toLabel;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Expanded(
-            child: _SearchField(controller: fromController, label: 'From')),
+            child: _SearchField(controller: fromController, label: fromLabel)),
         const SizedBox(width: 10),
-        Expanded(child: _SearchField(controller: toController, label: 'To')),
+        Expanded(child: _SearchField(controller: toController, label: toLabel)),
         const SizedBox(width: 10),
         IconButton.filled(
           onPressed: onSearch,
@@ -281,5 +299,22 @@ class _TravelCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+({String from, String to, String city}) _defaultInputsFor(String category) {
+  switch (category) {
+    case 'trains':
+      return (from: 'NDLS', to: 'BCT', city: 'Mumbai');
+    case 'flights':
+      return (from: 'DEL', to: 'BOM', city: 'Mumbai');
+    case 'buses':
+      return (from: 'Delhi', to: 'Jaipur', city: 'Jaipur');
+    case 'hotels':
+      return (from: 'Delhi', to: 'Mumbai', city: 'Delhi');
+    case 'shows':
+      return (from: 'Delhi', to: 'Mumbai', city: 'Mumbai');
+    default:
+      return (from: 'Delhi', to: 'Mumbai', city: 'Mumbai');
   }
 }
